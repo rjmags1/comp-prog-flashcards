@@ -774,9 +774,10 @@ SELECT * FROM TagTypeEnum;
 ### Phase 1
 
 __**__ = should be tested but implementing the tests not part of current phase
+
 __****__ = can be put off until first release/need for creation of final distribution binaries
 
-- Init tauri app with react for ui: 
+- **[ ✅ ]** Init tauri app with react for ui: 
     - https://create-react-app.dev/docs/getting-started#creating-a-typescript-app
     - https://tailwindcss.com/docs/installation
     - https://tauri.app/v1/guides/getting-started/setup/next-js (but use create-react-app instead)
