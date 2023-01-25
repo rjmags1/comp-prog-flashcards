@@ -25,7 +25,7 @@
 - **User**
     - id - integer PK
     - username - text not null unique
-    - avatar - integer FK ref Avatar.id default 1
+    - avatar - integer FK ref Image.id default 1
     - theme - integer FK ref ThemeEnum.enum_val default 1
     - tagmask - integer default 0
     - hidediffs - boolean default false
@@ -52,24 +52,24 @@
     - front - integer FK ref CardFront.id not null unique
     - back - integer FK ref CardBack.id not null unique
     - mastered - boolean default false
-    - source - integer FK ref Source.id
+    - source - integer FK ref Source.id not null
     - shipped - boolean default false
     - difficulty - integer FK ref Difficulty.enum_val not null
 
 - **Card_Deck**
     - rel_id - integer PK
-    - card - integer FK ref Card.id on delete cascade
-    - deck - integer FK ref Deck.id on delete cascade
+    - card - integer FK ref Card.id on delete cascade not null
+    - deck - integer FK ref Deck.id on delete cascade not null
 
 - **CardFront**
     - id - integer PK
-    - card - integer FK ref Card.id on delete cascade
+    - card - integer FK ref Card.id on delete cascade not null
     - prompt - text not null
     - title - text not null
 
 - **CardBack**
     - id - integer PK
-    - card - integer FK ref Card.id on delete cascade
+    - card - integer FK ref Card.id on delete cascade not null
     - notes - text not null
 
 - **Solution**
@@ -87,12 +87,11 @@
     - type - integer FK ref TagType.enum_val not null
     - name - text
     - content - text
-    - Constraint: one of source or name is must be null
 
 - **Card_Tag**
     - rel_id - integer PK
     - card - integer FK ref Card.id on delete cascade not null
-    - tag - integer FK ref Tag.id not null
+    - tag - integer FK ref Tag.id on delete cascade not null
     - Constraint: unique(card, tag)
 
 - **ThemeEnum**
@@ -573,10 +572,10 @@ INSERT INTO DifficultyEnum (name)
 VALUES ("Easy"), ("Medium"), ("Hard");
 <br>
 INSERT INTO TagTypeEnum (name)
-VALUES ("Paradigm", "Concept", "Trick");
+VALUES ("Paradigm"), ("Concept"), ("Trick");
 <br>
 INSERT INTO ThemeEnum (name)
-VALUES ("Normal", "Dark");
+VALUES ("Normal"), ("Dark");
 </code></pre></td>
     </tr>
     <tr>
@@ -787,7 +786,7 @@ __****__ = can be put off until first release/need for creation of final distrib
         - [Q30](#Q30) for filling enums
         - See https://docs.diesel.rs/2.0.x/diesel/sqlite/struct.SqliteConnection.html about `diesel::sqlite::SqliteConnection::establish`. No need to worry about creating an `sqlite.db` file on first run of final binary. Passed URL should be something like `"sqlite://sqlite.db"`.
     - will need to `PRAGMA foreign_keys = ON` via Diesel connection (`conn.batch_execute(“PRAGMA foreign_keys = ON”)`) everytime for FKs/cascade deletes to work; will also need to ensure shipped version of sqlite compiles with neither SQLITE_OMIT_FOREIGN_KEY nor SQLITE_OMIT_TRIGGER defined or enabling FK functionality via the PRAGMA will be useless (https://www.sqlite.org/foreignkeys.html).
-    - __****__ Will need to explicitly embed used version of sqlite binary into distributed binaries. See https://github.com/diesel-rs/diesel/issues/1860 and https://crates.io/crates/libsqlite3-sys section titled "Notes on building rusqlite and libsqlite3-sys"; this will be much easier than going https://tauri.app/v1/api/config#bundleconfig route, as long as it the bundled binary gets compiled with appropriate flags to allow foreign key/cascade delete support. If need to go the latter route, may consider compiling sqlite myself with appropriate flags and embedding the resulting binary, setting the `SQLITE3_LIB_DIR` environment variable. If neither of these approaches pan out can just work around non-support for FKs/cascading deletes by changing queries; annoying but doable.
+    - __****__ Will need to explicitly embed used version of sqlite binary into distributed binaries. See https://github.com/diesel-rs/diesel/issues/1860 and https://crates.io/crates/libsqlite3-sys section titled "Notes on building rusqlite and libsqlite3-sys"; this will be much easier than going https://tauri.app/v1/api/config#bundleconfig route, as long as the bundled binary gets compiled with appropriate flags to allow foreign key/cascade delete support. If need to go the latter route, may consider compiling sqlite myself with appropriate flags and embedding the resulting binary, setting the `SQLITE3_LIB_DIR` environment variable.
     - Diesel migration for preloading leetcode data
         - __**__ Write script that hits public Leetcode graphql API, reads relevant information and translates to raw sql for `up.sql` and `down.sql` diesel migration files (command-f 'up.sql' on https://diesel.rs/guides/getting-started).
         - See [Q10](#Q10), [Q13](#Q13), [Q31](#Q31), [Q32](#Q32), [Q33](#Q33). Generated SQL should be an aggregation of these.
