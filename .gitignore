@@ -18,3 +18,5 @@ yarn-error.log*
 
 **/*out.css
 **/*.db
+**/lc_data.txt
+src-tauri/up.sql
