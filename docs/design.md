@@ -772,10 +772,6 @@ SELECT * FROM TagTypeEnum;
 
 ### **[ ✅ ]** Phase 1 
 
-__**__ = should be tested but implementing the tests not part of current phase
-
-__****__ = can be put off until first release/need for creation of final distribution binaries
-
 - **[ ✅ ]** Init tauri app with react for ui: 
     - https://create-react-app.dev/docs/getting-started#creating-a-typescript-app
     - https://tailwindcss.com/docs/installation
@@ -794,21 +790,20 @@ __****__ = can be put off until first release/need for creation of final distrib
 ### Phase 2
 
 - Static react components - no interactivity or Tauri command invocations
-    - Components should adhere to single responsibility principle, and reasonably balance reusability with overcomplication.
-    - just markdown renderer? https://github.com/uiwjs/react-markdown-preview
-    - or editor too? https://github.com/uiwjs/react-markdown-editor
-    - ## TODO: more details
+    - Components should adhere to single responsibility principle, and reasonably balance reusability with interface overcomplication.
+    - See the [Component Tree](cpf-component-tree.html)
+    - For markdown rendering and editing, see: https://github.com/uiwjs/react-markdown-preview and https://github.com/uiwjs/react-markdown-editor
 
 ### Phase 3
-- __**__ Wrapper functions for above queries (in-memory sqlite to mock the real thing)
-- __**__ Tauri commands, which call query wrappers. How these commands get implemented should be clearer after finishing all static components.
-    - Think about how calling components should store certain data (current user, current deck, current card, current filters, etc. vs enums and other more static app data) in the frontend (React.context? Redux?) instead of reading the same stuff over and over from disk.
-    - ## TODO: more details
+- Wrapper functions for above queries (in-memory sqlite to mock the real thing) **[test]**
+- Tauri commands, which call query wrappers. How these commands get implemented will be clearer after finishing all static components. **[test]**
+- ## TODO: more details
 
 ### Phase 4
 
-- Make the frontend call the Tauri commands and add interactivity to the static components. The app should be a fully functional MVP after this phase.
-    - ## TODO: more details
+- Make the frontend call the Tauri commands and add interactivity to the static components. **[test]**
+- The app should be a fully functional MVP after this phase.
+- ## TODO: more details
 
 ### Phase 5
 - Test all above functionality annotated as needing it
@@ -816,5 +811,5 @@ __****__ = can be put off until first release/need for creation of final distrib
 - ## TODO: more details
 
 ### Phase 6
-- Add more color themes?
 - other ideas?
+- If the MVP looks good, start building bundles for distribution. Will need to use a VM to build for Windows, Linux. See https://tauri.app/v1/guides/building/ and https://tauri.app/v1/api/config#bundleconfig to get started.
