@@ -791,7 +791,7 @@ SELECT * FROM TagTypeEnum;
 
 - Static react components - no interactivity or Tauri command invocations
     - Components should adhere to single responsibility principle, and reasonably balance reusability with interface overcomplication.
-    - See the [Component Tree](cpf-component-tree.html)
+    - See the [Component Tree (.png)](cpf-component-tree.png) ([.svg](cpf-component-tree.svg))
     - For markdown rendering and editing, see: https://github.com/uiwjs/react-markdown-preview and https://github.com/uiwjs/react-markdown-editor
 
 ### Phase 3
