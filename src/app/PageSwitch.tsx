@@ -8,7 +8,7 @@ import { Page } from "../types"
 
 const HISTORY_CAP = 50
 
-function PageSwitch () {
+function PageSwitch() {
     const appContext = useContext(AppContext)
     if (appContext === null || appContext.updater === null) {
         return null
@@ -16,25 +16,27 @@ function PageSwitch () {
 
     const hist = appContext.pageHistory
     const histLen = hist.length
-
     if (histLen > HISTORY_CAP) {
-        appContext.updater({...AppContext, pageHistory: hist.slice(-50)})
+        appContext.updater({ ...AppContext, pageHistory: hist.slice(-50) })
         return null
     }
 
-    const entry = hist[histLen - 1]
-    switch (true) {
-        case entry[0] === Page.Login: {
+    const [page, cardId] = hist[histLen - 1]
+    switch (page) {
+        case Page.Login: {
             return <LoginPage />
         }
-        case entry[0] === Page.Decks: {
+        case Page.Decks: {
             return <DecksPage />
         }
-        case entry[0] === Page.Settings: {
+        case Page.Settings: {
             return <SettingsPage />
         }
+        case Page.Cards: {
+            return <CardsPage cardId={cardId} />
+        }
         default: {
-            return <CardsPage cardId={entry[1] as number} />
+            throw new Error("invalid page history entry")
         }
     }
 }

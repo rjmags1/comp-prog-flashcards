@@ -5,19 +5,22 @@ import { PopupMessageProps } from "../../types"
 
 function PopupMessage({ message, confirm, unrender }: PopupMessageProps) {
     return (
-        <div className="bg-stone-800 z-20 fixed top-[50%] border 
-            border-white rounded-md left-[50%] w-[400px] h-[200px] 
-            -ml-[200px] -mt-[100px] flex items-center justify-center
-            flex-col px-6">
-            { message }
-            { 
-            confirm && 
-            <button className="w-[100px] bg-green-500 py-1 px-2 
-                rounded-md border border-white mt-6 hover:bg-green-800"
-                onClick={() => unrender() }>
-                OK
-            </button> 
-            }
+        <div
+            className="fixed top-[50%] left-[50%] z-20 -ml-[200px] 
+            -mt-[100px] flex h-[200px] w-[400px] flex-col 
+            items-center justify-center rounded-md border border-white
+            bg-stone-800 px-6"
+        >
+            {message}
+            {confirm && (
+                <button
+                    className="mt-6 w-[100px] rounded-md border 
+                  border-white bg-green-500 py-1 px-2 hover:bg-green-800"
+                    onClick={() => unrender()}
+                >
+                    OK
+                </button>
+            )}
         </div>
     )
 }

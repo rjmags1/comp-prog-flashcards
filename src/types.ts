@@ -24,27 +24,27 @@ export enum Theme {
     Default,
 }
 
-
 ///////////////////////////
 ////////// APP ////////////
 ///////////////////////////
-export type HistoryEntry = [Exclude<Page, Page.Cards>, null] | [Page.Cards, number]
+export type HistoryEntry =
+    | [Exclude<Page, Page.Cards>, null]
+    | [Page.Cards, number]
 
 export interface Tag {
-    id: number,
-    type: TagType,
-    name: string,
-    content: string,
+    id: number
+    type: TagType
+    name: string
+    content: string
 }
-
 export interface AppLevelContext {
-    themes: Theme[],
-    userIds: number[],
-    currentUserInfo: User | null,
-    currentTheme: Theme,
-    pageHistory: HistoryEntry[],
-    tags: Tag[],
-    updater: React.Dispatch<React.SetStateAction<any>> | null,
+    themes: Theme[]
+    userIds: number[]
+    currentUserInfo: User | null
+    currentTheme: Theme
+    pageHistory: HistoryEntry[]
+    tags: Tag[]
+    updater: React.Dispatch<React.SetStateAction<any>> | null
 }
 
 ///////////////////////////
@@ -55,8 +55,8 @@ export interface ExitProps {
 }
 
 export interface PopupMessageProps {
-    message: string,
-    confirm?: boolean,
+    message: string
+    confirm?: boolean
     unrender: () => void
 }
 
@@ -68,11 +68,11 @@ export interface NewUserFormProps {
 }
 
 export interface User {
-    id: number,
-    username: string,
-    avatarPath: string,
-    theme: number,
-    tagMask: number,
+    id: number
+    username: string
+    avatarPath: string
+    theme: number
+    tagMask: number
     hideDiffMask: number
 }
 

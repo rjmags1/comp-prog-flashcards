@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import PageSwitch from './PageSwitch'
-import { AppLevelContext, Page } from '../types'
+import React, { useEffect, useState } from "react"
+import PageSwitch from "./PageSwitch"
+import { AppLevelContext, Page } from "../types"
 
 // TODO:
 // impl fetching of all user info and all existing tags (tags
@@ -15,24 +15,24 @@ function App() {
         currentUserInfo: null,
         currentTheme: 0,
         pageHistory: [[Page.Login, null]],
-        tags: [], 
+        tags: [],
         updater: null,
     })
 
     useEffect(() => {
         if (appContext.updater !== null) return
 
-        setAppContext(initialAppContext => ({
+        setAppContext((initialAppContext) => ({
             ...initialAppContext,
-            updater: setAppContext
+            updater: setAppContext,
         }))
     })
 
     return (
-        <div className="text-white bg-slate-900 w-full h-full">
-            <AppContext.Provider value={ appContext }>
+        <div className="h-full w-full bg-slate-900 text-white">
+            <AppContext.Provider value={appContext}>
                 <PageSwitch />
-            </AppContext.Provider >
+            </AppContext.Provider>
         </div>
     )
 }

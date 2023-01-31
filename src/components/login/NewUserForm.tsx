@@ -18,17 +18,22 @@ function NewUserForm({ unrender }: NewUserFormProps) {
     const message = `User add failed due to ${addFailReason}, try again`
 
     return (
-        <div className="bg-stone-800 rounded-lg absolute
-            border border-white w-fit h-fit z-10 p-10 flex 
-            flex-col gap-y-5 drop-shadow-2xl">
+        <div
+            className="absolute z-10 flex
+            h-fit w-fit flex-col gap-y-5 rounded-lg border border-white 
+            bg-stone-800 p-10 drop-shadow-2xl"
+        >
             <div className="flex items-center justify-between pb-4">
                 <h2 className="text-4xl font-bold">New User</h2>
-                <ExitButton exitCallback={unrender}/>
+                <ExitButton exitCallback={unrender} />
             </div>
             <div className="flex gap-x-2">
-                Username: 
-                <input className="rounded-sm text-black px-1 outline-none"
-                    type="text" onChange={e => setUsername(e.target.value) } />
+                Username:
+                <input
+                    className="rounded-sm px-1 text-black outline-none"
+                    type="text"
+                    onChange={(e) => setUsername(e.target.value)}
+                />
             </div>
             <div className="flex gap-x-2">
                 Avatar:
@@ -36,20 +41,27 @@ function NewUserForm({ unrender }: NewUserFormProps) {
             </div>
             <div className="flex gap-x-3">
                 Prefill a deck with Leetcode questions?
-                <input type="checkbox" checked={prefillDeck}
-                    onChange={e => setPrefillDeck(e.target.checked)} />
+                <input
+                    type="checkbox"
+                    checked={prefillDeck}
+                    onChange={(e) => setPrefillDeck(e.target.checked)}
+                />
             </div>
-            <button className="w-full bg-green-500 py-1 my-2 rounded 
-                border border-white hover:bg-green-800 hover:cursor-pointer
-                disabled:hover:bg-green-500 disabled:hover:cursor-default"
-                disabled={renderPopup}>
+            <button
+                className="my-2 w-full rounded border border-white 
+                bg-green-500 py-1 hover:cursor-pointer hover:bg-green-800
+                disabled:hover:cursor-default disabled:hover:bg-green-500"
+                disabled={renderPopup}
+            >
                 Add
             </button>
-            {
-            renderPopup && 
-            <PopupMessage confirm message={message} 
-                unrender={() => setRenderPopup(false) } />
-            }
+            {renderPopup && (
+                <PopupMessage
+                    confirm
+                    message={message}
+                    unrender={() => setRenderPopup(false)}
+                />
+            )}
         </div>
     )
 }

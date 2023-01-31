@@ -4,14 +4,14 @@ import NewUserForm from "../components/login/NewUserForm"
 import { User } from "../types"
 
 // temp data for building static version
-const users: User[] = [ 
+const users: User[] = [
     {
         id: 1,
         username: "user1",
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 2,
@@ -19,7 +19,7 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 3,
@@ -27,7 +27,7 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 4,
@@ -35,7 +35,7 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 5,
@@ -43,7 +43,7 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 6,
@@ -51,7 +51,7 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 7,
@@ -59,7 +59,7 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
     {
         id: 8,
@@ -67,31 +67,36 @@ const users: User[] = [
         avatarPath: "./default-avatar.png",
         theme: 0,
         tagMask: 0,
-        hideDiffMask: 0
+        hideDiffMask: 0,
     },
 ]
 
 function LoginPage() {
     const [showNewUserForm, setShowNewUserForm] = useState(false)
 
-    return  (
-        <div className="flex items-center justify-center w-full h-full px-8">
-            { 
-            showNewUserForm && 
-            <NewUserForm unrender={() => setShowNewUserForm(false)} /> 
-            }
-            <div className="flex flex-col items-center
-                justify-center w-full h-full gap-y-8 text-lg">
-                <h1 className="text-6xl text-center">
+    return (
+        <div className="flex h-full w-full items-center justify-center px-8">
+            {showNewUserForm && (
+                <NewUserForm unrender={() => setShowNewUserForm(false)} />
+            )}
+            <div
+                className="flex h-full w-full
+                flex-col items-center justify-center gap-y-8 text-lg"
+            >
+                <h1 className="text-center text-6xl">
                     Competitive Programming Flashcards
                 </h1>
-                <h3><em>Sign in</em></h3>
+                <h3>
+                    <em>Sign in</em>
+                </h3>
                 <UserList users={users} />
-                <button className="bg-green-500 hover:bg-green-800 
-                    px-4 py-0.5 rounded-lg border-white border-[1px] 
-                   disabled:hover:bg-green-500 disabled:hover:cursor-default"
-                    onClick={() => setShowNewUserForm(true)} 
-                    disabled={showNewUserForm}>
+                <button
+                    className="rounded-lg border-[1px] 
+                    border-white bg-green-500 px-4 py-0.5 hover:bg-green-800 
+                    disabled:hover:cursor-default disabled:hover:bg-green-500"
+                    onClick={() => setShowNewUserForm(true)}
+                    disabled={showNewUserForm}
+                >
                     + Add User
                 </button>
             </div>
