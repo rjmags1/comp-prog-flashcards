@@ -9,7 +9,7 @@ function User_(userInfo: User) {
     const clickHandler = () => {
         updater!({
             ...appContext,
-            currentUserInfo: userInfo,
+            currentUser: userInfo.id,
             pageHistory: [...pageHistory, [Page.Decks, null]],
         })
     }

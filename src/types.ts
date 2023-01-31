@@ -37,14 +37,15 @@ export interface Tag {
     name: string
     content: string
 }
+
 export interface AppLevelContext {
     themes: Theme[]
-    userIds: number[]
-    currentUserInfo: User | null
+    users: Map<number, User>
+    currentUser: number | null
     currentTheme: Theme
     pageHistory: HistoryEntry[]
     tags: Tag[]
-    updater: React.Dispatch<React.SetStateAction<any>> | null
+    updater: React.Dispatch<React.SetStateAction<AppLevelContext>> | null
 }
 
 ///////////////////////////

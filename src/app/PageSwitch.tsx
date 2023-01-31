@@ -17,7 +17,7 @@ function PageSwitch() {
     const hist = appContext.pageHistory
     const histLen = hist.length
     if (histLen > HISTORY_CAP) {
-        appContext.updater({ ...AppContext, pageHistory: hist.slice(-50) })
+        appContext.updater({ ...appContext, pageHistory: hist.slice(-50) })
         return null
     }
 

@@ -1,77 +1,11 @@
 import UserList from "../components/login/UserList"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import NewUserForm from "../components/login/NewUserForm"
-import { User } from "../types"
-
-// temp data for building static version
-const users: User[] = [
-    {
-        id: 1,
-        username: "user1",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 2,
-        username: "user2",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 3,
-        username: "user3",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 4,
-        username: "user4",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 5,
-        username: "user5",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 6,
-        username: "user6",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 7,
-        username: "user7",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-    {
-        id: 8,
-        username: "user8",
-        avatarPath: "./default-avatar.png",
-        theme: 0,
-        tagMask: 0,
-        hideDiffMask: 0,
-    },
-]
+import { AppLevelContext } from "../types"
+import { AppContext } from "../app/App"
 
 function LoginPage() {
+    const { users } = useContext(AppContext) as AppLevelContext
     const [showNewUserForm, setShowNewUserForm] = useState(false)
 
     return (
@@ -89,7 +23,7 @@ function LoginPage() {
                 <h3>
                     <em>Sign in</em>
                 </h3>
-                <UserList users={users} />
+                <UserList users={Array.from(users.values())} />
                 <button
                     className="rounded-lg border-[1px] 
                     border-white bg-green-500 px-4 py-0.5 hover:bg-green-800 
