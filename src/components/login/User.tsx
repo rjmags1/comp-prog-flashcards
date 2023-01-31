@@ -3,14 +3,16 @@ import { AppContext } from "../../app/App"
 import { useContext } from "react"
 
 function User_(userInfo: User) {
-    const { updater, pageHistory } = useContext(AppContext) as AppLevelContext
+    const appContext = useContext(AppContext) as AppLevelContext
+    const { updater, pageHistory } = appContext
 
-    const clickHandler = () =>
+    const clickHandler = () => {
         updater!({
+            ...appContext,
             currentUserInfo: userInfo,
-            pageHistory: [[Page.Decks, null], ...pageHistory],
-            ...AppContext,
+            pageHistory: [...pageHistory, [Page.Decks, null]],
         })
+    }
 
     const { avatarPath, username } = userInfo
     return (
