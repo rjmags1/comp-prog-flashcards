@@ -84,9 +84,9 @@ function App() {
     const [appContext, setAppContext] = useState<AppLevelContext>({
         themes: [],
         users: tempUserMap,
-        currentUser: null,
+        currentUser: 1,
         currentTheme: 0,
-        pageHistory: [[Page.Login, null]],
+        pageHistory: [[Page.Decks, null]],
         tags: [],
         updater: null,
     })

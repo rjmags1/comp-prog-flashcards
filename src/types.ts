@@ -58,7 +58,12 @@ export interface ExitProps {
 export interface PopupMessageProps {
     message: string
     confirm?: boolean
-    unrender: () => void
+    unrender: (d?: boolean) => void
+    whiteText?: boolean
+}
+
+export interface PageHeaderProps {
+    header: string
 }
 
 ///////////////////////////
@@ -91,6 +96,30 @@ export interface CardsPageProps {
 ///////////////////////////
 ////////// DECKS //////////
 ///////////////////////////
+export interface DecksLevelContext {
+    decks: Map<number, Deck>
+    addingNew: boolean
+    updater: React.Dispatch<React.SetStateAction<DecksLevelContext>> | null
+}
+
+export interface DecksListProps {
+    decks: Deck[]
+    renderBlank: boolean
+}
+
+export interface DeckProps {
+    deck: Deck | null
+    blank?: boolean
+}
+
+export interface Deck {
+    id: number
+    name: string
+    deleted: boolean
+    user: number
+    size: number
+    mastered: number
+}
 
 ///////////////////////////
 //////// SETTINGS /////////
