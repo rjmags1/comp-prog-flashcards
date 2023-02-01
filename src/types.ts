@@ -90,7 +90,7 @@ export interface UserListProps {
 ////////// CARDS //////////
 ///////////////////////////
 export interface CardsPageProps {
-    cardId: number
+    deckId: number
 }
 
 ///////////////////////////

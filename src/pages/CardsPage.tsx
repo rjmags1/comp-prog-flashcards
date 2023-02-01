@@ -1,6 +1,6 @@
 import { CardsPageProps } from "../types"
 
-function CardsPage({ cardId }: CardsPageProps) {
+function CardsPage({ deckId }: CardsPageProps) {
     return null
 }
 

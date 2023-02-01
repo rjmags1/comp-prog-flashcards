@@ -22,7 +22,10 @@ function PopupMessage({
                 <button
                     className="mt-6 w-[100px] rounded-md border 
                   border-white bg-green-500 py-1 px-2 hover:bg-green-800"
-                    onClick={() => unrender()}
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        unrender()
+                    }}
                 >
                     OK
                 </button>
@@ -31,14 +34,20 @@ function PopupMessage({
                     <button
                         className="mt-6 w-[100px] rounded-md border 
                     border-white bg-red-600 py-1 px-2 hover:bg-red-800"
-                        onClick={() => unrender(true)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            unrender(true)
+                        }}
                     >
                         Delete
                     </button>
                     <button
                         className="mt-6 w-[100px] rounded-md border 
                     border-white bg-gray-600 py-1 px-2 hover:bg-gray-800"
-                        onClick={() => unrender(false)}
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            unrender(false)
+                        }}
                     >
                         Cancel
                     </button>

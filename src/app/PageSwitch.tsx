@@ -21,7 +21,7 @@ function PageSwitch() {
         return null
     }
 
-    const [page, cardId] = hist[histLen - 1]
+    const [page, deckId] = hist[histLen - 1]
     switch (page) {
         case Page.Login: {
             return <LoginPage />
@@ -33,7 +33,7 @@ function PageSwitch() {
             return <SettingsPage />
         }
         case Page.Cards: {
-            return <CardsPage cardId={cardId} />
+            return <CardsPage deckId={deckId} />
         }
         default: {
             throw new Error("invalid page history entry")
