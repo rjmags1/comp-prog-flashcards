@@ -16,7 +16,13 @@ import { AppContext } from "../../app/App"
 //    - delete deck from db on delete button click and popup confirm
 
 function Deck_({ deck, blank }: DeckProps) {
-    const { name, mastered, size, id } = deck as Deck
+    let name = null,
+        mastered = 0,
+        size = 0,
+        id = -1
+    if (deck) {
+        ;({ name, mastered, size, id } = deck)
+    }
     const deckNameRef = useRef<HTMLInputElement | null>(null)
     const [editing, setEditing] = useState(false)
     const [deckName, setDeckName] = useState(name)
@@ -115,7 +121,7 @@ function Deck_({ deck, blank }: DeckProps) {
                     ref={deckNameRef}
                     className="-mt-1 w-full pt-4 text-center text-3xl outline-none"
                     autoFocus
-                    value={deckName}
+                    value={deckName as string}
                     onChange={(e) => {
                         e.stopPropagation()
                         setDeckName(e.target.value)
