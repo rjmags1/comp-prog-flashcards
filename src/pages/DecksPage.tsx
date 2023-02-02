@@ -2,7 +2,7 @@ import { useContext, createContext, useState, useEffect } from "react"
 import { AppContext } from "../app/App"
 import DecksList from "../components/decks/DecksList"
 import PageHeader from "../components/general/PageHeader"
-import { AppLevelContext, Deck, DecksLevelContext } from "../types"
+import { AppLevelContext, Deck, DecksLevelContext, Page } from "../types"
 
 // TODO:
 //    - impl tauri command to fetch all info about user deck
@@ -148,7 +148,7 @@ function DecksPage() {
     return (
         <div className="h-full w-full px-8">
             <DecksContext.Provider value={decksContext}>
-                <PageHeader header={header} />
+                <PageHeader header={header} page={Page.Decks} />
                 <DecksList
                     decks={Array.from(decksContext.decks.values())}
                     renderBlank={decksContext.addingNew}

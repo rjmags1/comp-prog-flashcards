@@ -15,9 +15,9 @@ export enum Difficulty {
 }
 
 export enum TagType {
-    Paradigm,
-    Concept,
-    Trick,
+    Paradigm = "Paradigm",
+    Concept = "Concept",
+    Trick = "Trick",
 }
 
 export enum Theme {
@@ -35,7 +35,7 @@ export interface Tag {
     id: number
     type: TagType
     name: string
-    content: string
+    content: string | null
 }
 
 export interface AppLevelContext {
@@ -44,7 +44,7 @@ export interface AppLevelContext {
     currentUser: number | null
     currentTheme: Theme
     pageHistory: HistoryEntry[]
-    tags: Tag[]
+    tags: Map<number, Tag>
     updater: React.Dispatch<React.SetStateAction<AppLevelContext>> | null
 }
 
@@ -64,6 +64,7 @@ export interface PopupMessageProps {
 
 export interface PageHeaderProps {
     header: string
+    page: Page
 }
 
 ///////////////////////////
@@ -91,6 +92,48 @@ export interface UserListProps {
 ///////////////////////////
 export interface CardsPageProps {
     deckId: number
+}
+
+export interface DeckLevelContext {
+    currentDeck: number
+    cards: Map<number, CardMetadata>
+    displayedCards: Map<number, CardMetadata>
+    currentCardId: number
+    currentCard: Card
+    addingNew: boolean
+    updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null
+}
+
+export interface Card {
+    metadata: CardMetadata
+    prompt: string
+    solution: string
+    notes: string
+}
+
+export interface CardMetadata {
+    id: number
+    front: number
+    back: number
+    mastered: boolean
+    source: number
+    shipped: boolean
+    difficulty: Difficulty
+    tags: Set<number>
+}
+
+export interface TagFilterProps {
+    tagType: TagType
+}
+
+export interface TagFilterOptionProps {
+    id: number
+    tag: Tag
+}
+
+export interface FilterLevelContext {
+    filterTags: Set<number>
+    updater: React.Dispatch<React.SetStateAction<FilterLevelContext>> | null
 }
 
 ///////////////////////////

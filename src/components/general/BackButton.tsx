@@ -7,9 +7,28 @@ function BackButton() {
     const { pageHistory, updater } = appContext
 
     const clickHandler = () => {
+        let newHistory = [...pageHistory]
+        const currPage = pageHistory[pageHistory.length - 1][0]
+        switch (currPage) {
+            case Page.Decks: {
+                newHistory.push([Page.Login, null])
+                break
+            }
+            case Page.Cards: {
+                newHistory.push([Page.Decks, null])
+                break
+            }
+            case Page.Settings: {
+                newHistory.pop()
+                break
+            }
+            default: {
+                throw new Error("back button rendered on login page")
+            }
+        }
         updater!({
             ...appContext,
-            pageHistory: [...pageHistory, [Page.Login, null]],
+            pageHistory: newHistory,
         })
     }
 
