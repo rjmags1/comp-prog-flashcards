@@ -24,6 +24,11 @@ export enum Theme {
     Default,
 }
 
+export enum ScrollDirection {
+    Prev,
+    Next,
+}
+
 ///////////////////////////
 ////////// APP ////////////
 ///////////////////////////
@@ -101,6 +106,7 @@ export interface DeckLevelContext {
     currentCardId: number
     currentCard: Card
     addingNew: boolean
+    filterTags: Set<number>
     updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null
 }
 
@@ -131,9 +137,8 @@ export interface TagFilterOptionProps {
     tag: Tag
 }
 
-export interface FilterLevelContext {
-    filterTags: Set<number>
-    updater: React.Dispatch<React.SetStateAction<FilterLevelContext>> | null
+export interface ScrollButtonProps {
+    direction: ScrollDirection
 }
 
 ///////////////////////////

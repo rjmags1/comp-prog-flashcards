@@ -10,7 +10,7 @@ import {
 import { useState, createContext, useEffect, useContext } from "react"
 import PageHeader from "../components/general/PageHeader"
 import { AppContext } from "../app/App"
-import CardList from "../components/cards/CardList"
+import Deck from "../components/cards/Deck"
 
 // TODO:
 //    - tauri command for fetching deck name all card metadata
@@ -92,6 +92,7 @@ function CardsPage({ deckId }: CardsPageProps) {
         currentCardId: 1,
         currentCard: tempCard,
         addingNew: false,
+        filterTags: new Set(),
         updater: null,
     })
 
@@ -114,7 +115,7 @@ function CardsPage({ deckId }: CardsPageProps) {
                 page={Page.Cards}
                 header={`${users.get(currentUser!)?.username} - ${deckName}`}
             />
-            <CardList />
+            <Deck />
         </DeckContext.Provider>
     )
 }

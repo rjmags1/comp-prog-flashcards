@@ -1,19 +1,28 @@
 import { useState, useEffect, useContext } from "react"
-import { FilterLevelContext, TagFilterOptionProps } from "../../types"
-import { FilterContext } from "./FilterController"
+import { TagFilterOptionProps, DeckLevelContext } from "../../types"
+import { DeckContext } from "../../pages/CardsPage"
 
 function TagFilterOption({ id, tag }: TagFilterOptionProps) {
-    const filterContext = useContext(FilterContext) as FilterLevelContext
-    const { filterTags, updater } = filterContext
+    const deckContext = useContext(DeckContext) as DeckLevelContext
+    const { filterTags, updater, cards } = deckContext
     const [selected, setSelected] = useState(filterTags.has(id))
 
     useEffect(() => {
         const newFilters = new Set(filterTags)
         if (selected) newFilters.add(id)
         else newFilters.delete(id)
+
+        const arrFilterTags = Array.from(newFilters)
+        const newDisplayed = Array.from(cards.entries()).filter(([_, card]) =>
+            arrFilterTags.every((t) => card.tags.has(t))
+        )
         updater!({
-            ...filterContext,
+            ...deckContext,
             filterTags: newFilters,
+            currentCardId: newDisplayed[0][0],
+            displayedCards: new Map(
+                newFilters.size === 0 ? cards : newDisplayed
+            ),
         })
     }, [selected])
 

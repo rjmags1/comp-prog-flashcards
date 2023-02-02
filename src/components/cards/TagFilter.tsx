@@ -1,17 +1,13 @@
 import { LegacyRef, useContext, useState } from "react"
-import {
-    AppLevelContext,
-    FilterLevelContext,
-    TagFilterProps,
-} from "../../types"
+import { AppLevelContext, DeckLevelContext, TagFilterProps } from "../../types"
 import { AppContext } from "../../app/App"
 import useOutsideClickHandler from "../../hooks"
 import TagFilterOption from "./TagFilterOption"
-import { FilterContext } from "./FilterController"
+import { DeckContext } from "../../pages/CardsPage"
 
 function TagFilter({ tagType }: TagFilterProps) {
     const { tags } = useContext(AppContext) as AppLevelContext
-    const { filterTags } = useContext(FilterContext) as FilterLevelContext
+    const { filterTags } = useContext(DeckContext) as DeckLevelContext
     const { ref, render, setRender } = useOutsideClickHandler(false)
     const [searchText, setSearchText] = useState("")
 
