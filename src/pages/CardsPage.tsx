@@ -73,8 +73,9 @@ const lorem =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Sed risus ultricies tristique nulla aliquet enim. Quam adipiscing vitae proin sagittis. Tempor orci dapibus ultrices in iaculis nunc sed. Volutpat odio facilisis mauris sit amet massa vitae tortor condimentum. Volutpat sed cras ornare arcu dui vivamus. Elementum tempus egestas sed sed risus pretium quam vulputate. Feugiat in fermentum posuere urna nec tincidunt praesent. Amet mattis vulputate enim nulla aliquet porttitor lacus. Vivamus at augue eget arcu dictum varius duis at consectetur. Ac placerat vestibulum lectus mauris. Elit scelerisque mauris pellentesque pulvinar pellentesque habitant. Nunc congue nisi vitae suscipit tellus mauris a diam. Sed tempus urna et pharetra pharetra massa. Pellentesque habitant morbi tristique senectus. Ultricies lacus sed turpis tincidunt id. Molestie nunc non blandit massa enim nec dui. Cursus in hac habitasse platea dictumst quisque sagittis purus. Nullam non nisi est sit amet facilisis magna etiam.\nCras ornare arcu dui vivamus arcu. Suscipit adipiscing bibendum est ultricies integer quis auctor elit. Risus pretium quam vulputate dignissim suspendisse. Iaculis urna id volutpat lacus laoreet non curabitur gravida. Faucibus vitae aliquet nec ullamcorper sit amet risus nullam eget. Adipiscing diam donec adipiscing tristique risus. Pharetra magna ac placerat vestibulum lectus mauris. Ultricies lacus sed turpis tincidunt id aliquet risus feugiat. Urna nunc id cursus metus aliquam eleifend mi in nulla. Ornare suspendisse sed nisi lacus sed viverra tellus in hac. Sed viverra ipsum nunc aliquet bibendum enim facilisis gravida."
 const tempCardsMap: Map<number, CardMetadata> = new Map()
 cards.forEach((card) => tempCardsMap.set(card.id, card))
-const tempCard: Card = {
+export const tempCard: Card = {
     metadata: cards[0],
+    title: "tempTitle",
     prompt: "# Some Question Prompt in Markdown\n\n" + lorem,
     solution: "# Some Solution in Markdown\n\n" + lorem,
     notes: "### Some Notes in Markdown\n\n" + lorem,
@@ -90,22 +91,22 @@ function CardsPage({ deckId }: CardsPageProps) {
         cards: tempCardsMap,
         displayedCards: new Map(tempCardsMap),
         currentCardId: 1,
-        currentCard: tempCard,
         addingNew: false,
         filterTags: new Set(),
         updater: null,
     })
 
     useEffect(() => {
+        if (deckName === "") {
+            // tauri command to get deck data
+            setDeckName("deck1")
+        }
         if (deckContext.updater === null) {
             setDeckContext({
                 ...deckContext,
                 updater: setDeckContext,
             })
-        }
-        if (deckName === "") {
-            // tauri command to get deck data
-            setDeckName("deck1")
+            return
         }
     })
 

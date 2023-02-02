@@ -9,9 +9,9 @@ export enum Page {
 }
 
 export enum Difficulty {
-    Easy,
-    Medium,
-    Hard,
+    Easy = "Easy",
+    Medium = "Medium",
+    Hard = "Hard",
 }
 
 export enum TagType {
@@ -104,7 +104,6 @@ export interface DeckLevelContext {
     cards: Map<number, CardMetadata>
     displayedCards: Map<number, CardMetadata>
     currentCardId: number
-    currentCard: Card
     addingNew: boolean
     filterTags: Set<number>
     updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null
@@ -112,6 +111,7 @@ export interface DeckLevelContext {
 
 export interface Card {
     metadata: CardMetadata
+    title: string
     prompt: string
     solution: string
     notes: string
@@ -137,8 +137,16 @@ export interface TagFilterOptionProps {
     tag: Tag
 }
 
+export interface CardHeaderProps {
+    cardData: Card
+}
+
 export interface ScrollButtonProps {
     direction: ScrollDirection
+}
+
+export interface ToggleMasteryButtonProps {
+    status: boolean
 }
 
 ///////////////////////////

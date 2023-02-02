@@ -33,7 +33,8 @@ function TagFilter({ tagType }: TagFilterProps) {
                 {!render && (
                     <div
                         onClick={() => setRender(true)}
-                        className="flex justify-between pt-1"
+                        className="flex select-none justify-between pt-1 
+                            hover:cursor-pointer"
                     >
                         <span>{tagType}s</span>
                         <span className="mt-[1.5px] text-sm">▼</span>
