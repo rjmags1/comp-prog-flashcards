@@ -3,7 +3,7 @@ import { AddTagToCardButtonProps } from "../../types"
 import AddTagsModal from "./AddTagsModal"
 
 function AddTagToCardButton({ cardTags, adder }: AddTagToCardButtonProps) {
-    const [renderModal, setRenderModal] = useState(true)
+    const [renderModal, setRenderModal] = useState(false)
 
     return (
         <>

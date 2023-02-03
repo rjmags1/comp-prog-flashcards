@@ -1,4 +1,3 @@
-import Modal from "../general/Modal"
 import { useState } from "react"
 import AddToDeckModal from "./AddToDeckModal"
 
@@ -19,7 +18,7 @@ function AddCardToDeckButton() {
                 className="hover:opacity-50"
                 onClick={() => setRenderModal(true)}
             >
-                <img src="deck.png" className="max-w-[45px]"></img>
+                <img src="deck.png" className="max-w-[30px]"></img>
             </button>
         </>
     )

@@ -42,7 +42,7 @@ function DeleteCardFromDeckButton() {
             )}
             <button
                 title="Delete card from deck"
-                className="text-3xl hover:opacity-50"
+                className="text-lg hover:opacity-50"
                 onClick={() => setRenderPopup(true)}
             >
                 🗑

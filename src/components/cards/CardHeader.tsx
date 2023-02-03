@@ -9,9 +9,9 @@ function CardHeader({ cardData }: CardHeaderProps) {
             <span className="no-wrap mr-2 w-max text-xl font-extrabold">
                 {cardData.title} - {cardData.metadata.difficulty}
             </span>
-            <ToggleMasteryButton status={false} />
             <AddCardToDeckButton />
             <DeleteCardFromDeckButton />
+            <ToggleMasteryButton status={false} />
         </div>
     )
 }
