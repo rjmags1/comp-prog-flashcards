@@ -11,9 +11,9 @@ function Modal({ children, whiteText, widthVw, heightVh }: ModalProps) {
     return (
         <div
             style={style}
-            className="fixed top-[50%] left-[50%] z-20 flex flex-col 
-            items-center justify-center rounded-md border border-white
-            bg-stone-800 px-6 text-base drop-shadow-xl"
+            className="no-scrollbar fixed top-[50%] left-[50%] z-20 flex 
+            flex-col items-center justify-center overflow-hidden overflow-y-scroll
+            rounded-md border border-gray-300 bg-stone-800 px-6 text-base drop-shadow-xl"
         >
             {children}
         </div>

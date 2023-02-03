@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import { DeckContext, tempCard } from "../../pages/CardsPage"
 import { Card, CardMetadata, DeckLevelContext } from "../../types"
 import CardHeader from "./CardHeader"
+import CardTags from "./CardTags"
 
 // TODO:
 //    - tauri command for fetching card prompt, solution, notes, title
@@ -31,6 +32,7 @@ function Card_() {
     return (
         <div className="mx-4 h-full basis-full rounded-md bg-white">
             <CardHeader cardData={cardData} />
+            <CardTags cardData={cardData} />
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import PageSwitch from "./PageSwitch"
 import { AppLevelContext, Page, Tag, TagType, User } from "../types"
+import "react-tooltip/dist/react-tooltip.css"
 
 // TODO:
 // impl fetching of all user info and all existing tags (tags
@@ -85,7 +86,7 @@ const tags: Tag[] = [
         id: 1,
         type: TagType.Paradigm,
         name: "graph",
-        content: null,
+        content: "Some sample content",
     },
     {
         id: 2,

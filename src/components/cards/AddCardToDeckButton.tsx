@@ -3,7 +3,7 @@ import { useState } from "react"
 import AddToDeckModal from "./AddToDeckModal"
 
 function AddCardToDeckButton() {
-    const [renderModal, setRenderModal] = useState(true)
+    const [renderModal, setRenderModal] = useState(false)
 
     return (
         <>

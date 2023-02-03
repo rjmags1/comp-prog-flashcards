@@ -61,7 +61,7 @@ function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
                         decks.filter((o) => o.value === currentDeck)[0],
                     ]}
                     isMulti
-                    name="colors"
+                    name="decks"
                     onChange={(selected) => setSelectedDecks(selected)}
                     value={selectedDecks}
                     placeholder="Select decks..."

@@ -31,6 +31,29 @@ export enum ScrollDirection {
     Next,
 }
 
+enum ColorPalette {
+    Emerald = "#047857",
+    Sky = "#0ea5e9",
+    Purple = "#9333ea",
+    Red = "#9f1239",
+    Orange = "#ea580c",
+    Blue = "#1e40af",
+    Salmon = "#ec4899",
+    Brown = "#7c2d12",
+    Gray = "#3f3f46",
+}
+export const colors: ReadonlyArray<ColorPalette> = [
+    ColorPalette.Emerald,
+    ColorPalette.Sky,
+    ColorPalette.Purple,
+    ColorPalette.Red,
+    ColorPalette.Orange,
+    ColorPalette.Blue,
+    ColorPalette.Salmon,
+    ColorPalette.Brown,
+    ColorPalette.Gray,
+]
+
 ///////////////////////////
 ////////// APP ////////////
 ///////////////////////////
@@ -112,6 +135,27 @@ export interface UserListProps {
 ///////////////////////////
 export interface CardsPageProps {
     deckId: number
+}
+
+export interface CardTagsProps {
+    cardData: Card
+}
+
+export interface TagProps {
+    tagData: Tag
+    color: ColorPalette
+    remover: () => void
+}
+
+export interface AddTagsModalProps {
+    cardTags: Tag[]
+    unrender: () => void
+    adder: (newTags: Tag[]) => void
+}
+
+export interface AddTagToCardButtonProps {
+    cardTags: Tag[]
+    adder: (newTags: Tag[]) => void
 }
 
 export interface DeckLevelContext {

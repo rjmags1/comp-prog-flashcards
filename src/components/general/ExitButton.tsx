@@ -1,6 +1,6 @@
 import { ExitProps } from "../../types"
 
-function Exit({ exitCallback }: ExitProps) {
+function ExitButton({ exitCallback }: ExitProps) {
     return (
         <button className="text-3xl" onClick={() => exitCallback()}>
             ✕
@@ -8,4 +8,4 @@ function Exit({ exitCallback }: ExitProps) {
     )
 }
 
-export default Exit
+export default ExitButton
