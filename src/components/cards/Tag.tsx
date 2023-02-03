@@ -22,7 +22,7 @@ function Tag({ tagData, color, remover }: TagProps) {
         <div
             id={anchorId}
             style={{ backgroundColor: color }}
-            className="flex h-full max-w-[20%] items-center justify-between
+            className="flex h-[1.6rem] max-w-[20%] items-center justify-between
             gap-x-2 rounded-full border-2 border-gray-300 px-2 text-sm 
             text-white hover:cursor-default"
         >

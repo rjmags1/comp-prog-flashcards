@@ -17,7 +17,8 @@ function CardTags({ cardData }: CardTagsProps) {
 
     return (
         <div
-            className="flex h-[2.75rem] w-full flex-wrap 
+            id="card-tags"
+            className="flex h-fit w-full flex-wrap 
             items-center gap-x-2 px-4 py-2"
         >
             <AddTagToCardButton

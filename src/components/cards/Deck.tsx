@@ -7,12 +7,12 @@ function Deck() {
     return (
         <div
             className="flex h-[90%] w-full flex-col items-center 
-                justify-center gap-y-6"
+                justify-center gap-y-6 overflow-hidden"
         >
             <FilterController />
             <div
-                className="flex h-full w-full items-center 
-                    justify-center gap-x-2 px-6 pb-6"
+                className="mb-6 flex h-full w-full 
+                    items-center justify-center gap-x-2 px-6"
             >
                 <ScrollButton direction={ScrollDirection.Prev} />
                 <Card />

@@ -16,7 +16,7 @@ function AddTagToCardButton({ cardTags, adder }: AddTagToCardButtonProps) {
             )}
             <button
                 onClick={() => setRenderModal(true)}
-                className="flex h-[88%] w-max items-center justify-center
+                className="flex h-[1.45rem] w-max items-center justify-center
                 gap-x-2 rounded-full bg-black px-2 pr-3 text-sm 
                 text-white hover:bg-slate-600"
             >

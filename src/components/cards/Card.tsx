@@ -1,6 +1,8 @@
 import { useContext, useEffect, useState } from "react"
 import { DeckContext, tempCard } from "../../pages/CardsPage"
 import { Card, CardMetadata, DeckLevelContext } from "../../types"
+import CardBack from "./CardBack"
+import CardFront from "./CardFront"
 import CardHeader from "./CardHeader"
 import CardTags from "./CardTags"
 
@@ -9,6 +11,7 @@ import CardTags from "./CardTags"
 
 function Card_() {
     const { currentCardId, cards } = useContext(DeckContext) as DeckLevelContext
+    const [showFront, setShowFront] = useState(true)
     const [cardData, setCardData] = useState<Card>({
         metadata: cards.get(currentCardId) as CardMetadata,
         title: "tempTitle",
@@ -30,9 +33,13 @@ function Card_() {
     }, [currentCardId])
 
     return (
-        <div className="mx-4 h-full basis-full rounded-md bg-white">
+        <div
+            id="card"
+            className="mx-4 flex h-full flex-col rounded-md bg-white"
+        >
             <CardHeader cardData={cardData} />
             <CardTags cardData={cardData} />
+            {showFront ? <CardFront cardData={cardData} /> : <CardBack />}
         </div>
     )
 }

@@ -141,6 +141,14 @@ export interface CardTagsProps {
     cardData: Card
 }
 
+export interface CardFrontProps {
+    cardData: Card
+}
+
+export interface PromptProps {
+    cardData: Card
+}
+
 export interface TagProps {
     tagData: Tag
     color: ColorPalette

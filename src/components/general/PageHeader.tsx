@@ -6,7 +6,7 @@ import SettingsButton from "./SettingsButton"
 
 function PageHeader({ header, page }: PageHeaderProps) {
     return (
-        <div className="sticky flex h-[10%] items-center justify-between px-10">
+        <div className="flex h-[10%] items-center justify-between px-10">
             <BackButton />
             <h1 className="text-4xl">{header}</h1>
             <div className="flex items-center gap-x-6">
