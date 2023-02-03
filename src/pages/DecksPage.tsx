@@ -7,7 +7,7 @@ import { AppLevelContext, Deck, DecksLevelContext, Page } from "../types"
 // TODO:
 //    - impl tauri command to fetch all info about user deck
 
-const tempDecks: Deck[] = [
+export const tempDecks: Deck[] = [
     {
         id: 1,
         name: "deck1",

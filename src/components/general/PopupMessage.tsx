@@ -15,7 +15,7 @@ function PopupMessage({
             className="fixed top-[50%] left-[50%] z-20 -ml-[200px] 
             -mt-[100px] flex h-[200px] w-[400px] flex-col 
             items-center justify-center rounded-md border border-white
-            bg-stone-800 px-6 text-base"
+            bg-stone-800 px-6 text-base drop-shadow-xl"
         >
             {message}
             {confirm ? (

@@ -1,3 +1,5 @@
+import { ReactNode } from "react"
+
 ///////////////////////////
 ////////// ENUMS //////////
 ///////////////////////////
@@ -70,6 +72,19 @@ export interface PopupMessageProps {
 export interface PageHeaderProps {
     header: string
     page: Page
+}
+
+export interface ModalProps {
+    children: ReactNode
+    whiteText?: boolean
+    widthVw: number
+    heightVh: number
+}
+
+export interface AddToDeckModalProps {
+    widthVw: number
+    heightVh: number
+    unrender: () => void
 }
 
 ///////////////////////////

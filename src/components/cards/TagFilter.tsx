@@ -51,9 +51,8 @@ function TagFilter({ tagType }: TagFilterProps) {
                 )}
                 {render && (
                     <div
-                        className="no-scrollbar absolute -ml-2 mt-[1px] 
-                        max-h-[80vh] w-full overflow-y-scroll 
-                        rounded-b-md bg-white"
+                        className="no-scrollbar absolute -ml-2 mt-[1px] max-h-[80vh] 
+                        w-full overflow-y-scroll rounded-b-md bg-white drop-shadow-xl"
                     >
                         {options}
                     </div>
