@@ -1,64 +1,110 @@
-import { LegacyRef, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { AppLevelContext, DeckLevelContext, TagFilterProps } from "../../types"
 import { AppContext } from "../../app/App"
-import useOutsideClickHandler from "../../hooks"
-import TagFilterOption from "./TagFilterOption"
 import { DeckContext } from "../../pages/CardsPage"
+import Select, { Options } from "react-select"
+
+interface TagFilterOption {
+    value: string
+    label: string
+    id: number
+    selected: boolean
+}
 
 function TagFilter({ tagType }: TagFilterProps) {
     const { tags } = useContext(AppContext) as AppLevelContext
-    const { filterTags } = useContext(DeckContext) as DeckLevelContext
-    const { ref, render, setRender } = useOutsideClickHandler(false)
-    const [searchText, setSearchText] = useState("")
+    const deckContext = useContext(DeckContext) as DeckLevelContext
+    const { filterTags, updater } = deckContext
 
-    const options = Array.from(tags.entries())
-        .filter(
-            ([_, tag]) =>
-                tag.type === tagType && tag.name.indexOf(searchText) > -1
-        )
-        .map(([id, tag]) => <TagFilterOption key={id} id={id} tag={tag} />)
-    options.sort(
-        (tag1, tag2) =>
-            Number(filterTags.has(tag2.props.id)) -
-            Number(filterTags.has(tag1.props.id))
-    )
+    const options: Options<TagFilterOption> = Array.from(tags)
+        .filter(([tagId, tag]) => tag.type === tagType)
+        .map(([tagId, tag]) => ({
+            value: tag.name,
+            label: tag.name,
+            id: tagId,
+            selected: filterTags.has(tagId),
+        }))
+        .sort((t1, t2) => Number(t2.selected) - Number(t1.selected))
+
+    const selectedIds = options.filter((o) => o.selected).map((o) => o.id)
 
     return (
-        <>
-            <div
-                style={render ? { borderRadius: ".375rem .375rem 0 0" } : {}}
-                ref={ref as LegacyRef<HTMLDivElement>}
-                className="relative min-w-[20%] shrink rounded-md bg-white px-2"
-            >
-                {!render && (
-                    <div
-                        onClick={() => setRender(true)}
-                        className="flex select-none justify-between pt-1 
-                            hover:cursor-pointer"
-                    >
-                        <span>{tagType}s</span>
-                        <span className="mt-[1.5px] text-sm">▼</span>
-                    </div>
-                )}
-                {render && (
-                    <input
-                        placeholder="Search"
-                        value={searchText}
-                        autoFocus
-                        className="flex w-full justify-between rounded-md pt-1 text-black outline-none"
-                        onChange={(e) => setSearchText(e.target.value)}
-                    ></input>
-                )}
-                {render && (
-                    <div
-                        className="no-scrollbar absolute -ml-2 mt-[1px] max-h-[80vh] 
-                        w-full overflow-y-scroll rounded-b-md bg-white drop-shadow-xl"
-                    >
-                        {options}
-                    </div>
-                )}
-            </div>
-        </>
+        <Select
+            className="min-w-[18%]"
+            isSearchable={true}
+            isClearable={selectedIds.length > 0}
+            value={{
+                label: `${tagType}s`,
+                value: `${tagType}s`,
+                id: 0,
+                selected: false,
+            }}
+            onChange={(clicked) => {
+                let newFilterTags = new Set(filterTags)
+                if (clicked === null) {
+                    for (const sid of selectedIds) newFilterTags.delete(sid)
+                } else {
+                    const clickedId = clicked.id
+                    if (clicked!.selected) {
+                        newFilterTags.delete(clickedId)
+                    } else {
+                        newFilterTags.add(clickedId)
+                    }
+                }
+                updater!({
+                    ...deckContext,
+                    filterTags: newFilterTags,
+                })
+            }}
+            closeMenuOnSelect={false}
+            options={options}
+            styles={{
+                control: (baseStyles, state) => ({
+                    borderRadius: ".375rem",
+                    display: "flex",
+                    backgroundColor: "white",
+                }),
+                menu: (baseStyles, state) => ({
+                    ...baseStyles,
+                    maxHeight: "70vh",
+                }),
+                input: (baseStyles, state) => ({
+                    ...baseStyles,
+                    outline: "none",
+                }),
+                placeholder: (baseStyles, state) => ({
+                    ...baseStyles,
+                    color: "black",
+                }),
+                dropdownIndicator: (baseStyles, state) => ({
+                    ...baseStyles,
+                    color: "black",
+                }),
+                indicatorSeparator: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: "black",
+                }),
+                option: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: state.data.selected ? "#22c55e" : "",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    fontSize: "0.875rem",
+                    lineHeight: "1.25rem",
+                    "&:hover": {
+                        cursor: "pointer",
+                        backgroundColor: state.data.selected
+                            ? "#22c55e"
+                            : "#a7f3d0",
+                    },
+                }),
+                clearIndicator: (baseStyles, state) => ({
+                    ...baseStyles,
+                    color: "red",
+                }),
+            }}
+        />
     )
 }
 

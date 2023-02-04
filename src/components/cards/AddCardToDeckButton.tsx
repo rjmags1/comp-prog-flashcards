@@ -9,7 +9,7 @@ function AddCardToDeckButton() {
             {renderModal && (
                 <AddToDeckModal
                     widthVw={60}
-                    heightVh={40}
+                    heightVh={70}
                     unrender={() => setRenderModal(false)}
                 />
             )}

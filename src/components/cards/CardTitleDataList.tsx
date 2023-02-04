@@ -1,7 +1,7 @@
 import { DeckContext } from "../../pages/CardsPage"
-import { LegacyRef, useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { DeckLevelContext } from "../../types"
-import useOutsideClickHandler from "../../hooks"
+import Select, { Options } from "react-select"
 
 // TODO:
 //    - tauri command to get titles of all cards in the current deck
@@ -22,12 +22,17 @@ tempTitles.forEach((t, i) => {
     tempTitlesMap.set(i + 1, t)
 })
 
+interface CardTitleOption {
+    label: string
+    value: string
+    id: number
+}
+
 function CardTitleDatalist() {
     const [allTitles, setAllTitles] = useState<Map<number, string>>(new Map())
     const [searchText, setSearchText] = useState("")
     const deckContext = useContext(DeckContext) as DeckLevelContext
-    const { currentDeck, displayedCards, cards, updater } = deckContext
-    const { ref, render, setRender } = useOutsideClickHandler(false)
+    const { currentDeck, displayedCards, updater, currentCardId } = deckContext
 
     useEffect(() => {
         if (allTitles.size > 0) return
@@ -37,53 +42,62 @@ function CardTitleDatalist() {
         setAllTitles(tempTitlesMap)
     })
 
+    const options: Options<CardTitleOption> =
+        allTitles.size === 0
+            ? []
+            : Array.from(displayedCards.keys())
+                  .filter(
+                      (id) =>
+                          displayedCards.has(id) &&
+                          allTitles.get(id)!.indexOf(searchText) > -1
+                  )
+                  .map((id) => ({
+                      label: allTitles.get(id)!,
+                      value: allTitles.get(id)!,
+                      id: id,
+                  }))
+
     return (
-        <div
-            className="grow-1 relative shrink basis-full"
-            ref={ref as LegacyRef<HTMLDivElement>}
-            onClick={() => setRender(true)}
-        >
-            <input
-                style={
-                    render && displayedCards.size > 0
-                        ? { borderRadius: ".375rem .375rem 0 0" }
-                        : {}
-                }
-                onChange={(e) => setSearchText(e.target.value)}
-                className="w-full rounded-md py-1 px-2 outline-none"
-                placeholder="List, search filtered questions by title"
-            />
-            {render && (
-                <div
-                    className="no-scrollbar absolute -mt-1 max-h-[80vh] w-full 
-                        overflow-y-scroll rounded-b-md bg-white"
-                >
-                    {Array.from(allTitles.entries())
-                        .filter(
-                            ([cardId, title]) =>
-                                title.indexOf(searchText) > -1 &&
-                                displayedCards.has(cardId)
-                        )
-                        .map(([cardId, title]) => (
-                            <option
-                                key={cardId}
-                                className="no-wrap overflow-hidden text-ellipsis rounded-b-md
-                                    px-2 py-1 hover:bg-slate-100"
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    updater!({
-                                        ...deckContext,
-                                        currentCardId: cardId,
-                                    })
-                                    setRender(false)
-                                }}
-                            >
-                                {title}
-                            </option>
-                        ))}
-                </div>
-            )}
-        </div>
+        <Select
+            className="w-full"
+            options={options}
+            closeMenuOnSelect={true}
+            value={null}
+            placeholder="List, search cards by text..."
+            onChange={(option) => {
+                updater!({
+                    ...deckContext,
+                    currentCardId: option!.id,
+                })
+            }}
+            styles={{
+                control: (baseStyles, state) => ({
+                    borderRadius: ".375rem",
+                    display: "flex",
+                    backgroundColor: "white",
+                }),
+                menu: (baseStyles, state) => ({
+                    ...baseStyles,
+                    maxHeight: "70vh",
+                }),
+                input: (baseStyles, state) => ({
+                    ...baseStyles,
+                    outline: "none",
+                }),
+                placeholder: (baseStyles, state) => ({
+                    ...baseStyles,
+                    color: "black",
+                }),
+                dropdownIndicator: (baseStyles, state) => ({
+                    ...baseStyles,
+                    color: "black",
+                }),
+                indicatorSeparator: (baseStyles, state) => ({
+                    ...baseStyles,
+                    backgroundColor: "black",
+                }),
+            }}
+        />
     )
 }
 

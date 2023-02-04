@@ -199,11 +199,6 @@ export interface TagFilterProps {
     tagType: TagType
 }
 
-export interface TagFilterOptionProps {
-    id: number
-    tag: Tag
-}
-
 export interface CardHeaderProps {
     cardData: Card
 }

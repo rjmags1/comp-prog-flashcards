@@ -23,8 +23,8 @@ function Tag({ tagData, color, remover }: TagProps) {
             id={anchorId}
             style={{ backgroundColor: color }}
             className="flex h-[1.6rem] max-w-[20%] items-center justify-between
-            gap-x-2 rounded-full border-2 border-gray-300 px-2 text-sm 
-            text-white hover:cursor-default"
+            gap-x-2 rounded-full border-2 border-gray-300 px-2 
+            text-sm text-white hover:cursor-default"
         >
             {renderPopup && (
                 <PopupMessage
@@ -43,10 +43,10 @@ function Tag({ tagData, color, remover }: TagProps) {
                     anchorId={anchorId}
                 />
             )}
-            <span className="truncate">{tagData.name}</span>
+            <span className="h-full truncate align-middle">{tagData.name}</span>
             <button
                 onClick={() => setRenderPopup(true)}
-                className="text-base hover:opacity-50"
+                className="pb-[2px] text-base hover:opacity-50"
             >
                 ×
             </button>

@@ -48,18 +48,26 @@ function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
         <Modal widthVw={widthVw} heightVh={heightVh}>
             <div
                 className="relative flex h-full w-full flex-col 
-                items-center justify-center gap-y-6 text-white"
+                items-center justify-start gap-y-5 overflow-hidden text-white"
             >
-                <div className="absolute bottom-[75%] flex w-[80%] justify-end">
+                <div className="flex w-full justify-end pt-6 pr-6">
                     <ExitButton exitCallback={unrender} />
                 </div>
-                <h5 className="w-[80%] text-left text-xl italic">
+                <h5 className="-mt-4 w-[80%] text-left text-xl italic">
                     Add this card to other decks
                 </h5>
+                <button
+                    className="w-[80%] rounded bg-green-500 px-2 py-1 
+                    text-white hover:bg-green-800"
+                    onClick={handleAdd}
+                >
+                    + Save
+                </button>
                 <Select
                     defaultValue={[
                         decks.filter((o) => o.value === currentDeck)[0],
                     ]}
+                    defaultMenuIsOpen={true}
                     isMulti
                     name="decks"
                     onChange={(selected) => setSelectedDecks(selected)}
@@ -81,13 +89,6 @@ function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
                         }),
                     }}
                 />
-                <button
-                    className="w-[80%] rounded bg-green-500 px-2 py-1 
-                    text-white hover:bg-green-800"
-                    onClick={handleAdd}
-                >
-                    + Save
-                </button>
             </div>
         </Modal>
     )
