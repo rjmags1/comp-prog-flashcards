@@ -186,6 +186,22 @@ export interface Tab {
     index: number
 }
 
+export interface NewTabProps {
+    addingNew: boolean
+    opener: () => void
+    saver: (newTitle: string) => void
+    discarder: () => void
+}
+
+export interface TabProps {
+    addingNew: boolean
+    title: string
+    selectedIndex: number
+    index: number
+    deletePopupRenderer: () => void
+    clickHandler: () => void
+}
+
 export interface Card {
     metadata: CardMetadata
     title: string
