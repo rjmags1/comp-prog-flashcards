@@ -35,7 +35,7 @@ function Card_() {
     return (
         <div
             id="card"
-            className="mx-4 flex h-full flex-col rounded-md bg-white"
+            className="flex h-full w-[80%] basis-full flex-col rounded-md bg-white"
         >
             <CardHeader cardData={cardData} />
             <CardTags cardData={cardData} />

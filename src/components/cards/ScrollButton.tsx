@@ -22,8 +22,9 @@ function ScrollButton({ direction }: ScrollButtonProps) {
     return (
         <span
             onClick={scroll}
-            className="flex h-full w-fit select-none items-center justify-center
-                rounded px-2 text-4xl hover:cursor-pointer hover:bg-blue-900"
+            className="mx-2 flex h-full w-[7%] select-none items-center
+                justify-center rounded px-2 text-4xl hover:cursor-pointer 
+                hover:bg-blue-900"
         >
             {direction === ScrollDirection.Prev ? "◀" : "▶"}
         </span>

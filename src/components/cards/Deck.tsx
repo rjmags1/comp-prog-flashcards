@@ -12,7 +12,7 @@ function Deck() {
             <FilterController />
             <div
                 className="mb-6 flex h-[90%] w-full 
-                    items-center justify-center gap-x-2 px-6"
+                    items-center justify-center"
             >
                 <ScrollButton direction={ScrollDirection.Prev} />
                 <Card />
