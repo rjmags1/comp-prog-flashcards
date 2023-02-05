@@ -14,7 +14,7 @@ interface TagFilterOption {
 function TagFilter({ tagType }: TagFilterProps) {
     const { tags } = useContext(AppContext) as AppLevelContext
     const deckContext = useContext(DeckContext) as DeckLevelContext
-    const { filterTags, updater } = deckContext
+    const { filterTags, updater, cards } = deckContext
 
     const options: Options<TagFilterOption> = Array.from(tags)
         .filter(([tagId, tag]) => tag.type === tagType)
@@ -51,9 +51,22 @@ function TagFilter({ tagType }: TagFilterProps) {
                         newFilterTags.add(clickedId)
                     }
                 }
+                const newFilterTagsArr = Array.from(newFilterTags)
+                const newDisplayedCardsArr = Array.from(cards.entries()).filter(
+                    ([_, metadata]) =>
+                        newFilterTags.size === 0 ||
+                        newFilterTagsArr.every((tagId) =>
+                            metadata.tags.has(tagId)
+                        )
+                )
                 updater!({
                     ...deckContext,
                     filterTags: newFilterTags,
+                    displayedCards: new Map(newDisplayedCardsArr),
+                    currentCardId:
+                        newDisplayedCardsArr.length > 0
+                            ? newDisplayedCardsArr[0][0]
+                            : -1,
                 })
             }}
             closeMenuOnSelect={false}
