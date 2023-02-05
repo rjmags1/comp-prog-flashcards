@@ -11,12 +11,12 @@ import CardTags from "./CardTags"
 
 function Card_() {
     const { currentCardId, cards } = useContext(DeckContext) as DeckLevelContext
-    const [showFront, setShowFront] = useState(true)
+    const [showFront, setShowFront] = useState(false)
     const [cardData, setCardData] = useState<Card>({
         metadata: cards.get(currentCardId) as CardMetadata,
         title: "tempTitle",
         prompt: "",
-        solution: "",
+        solutions: [],
         notes: "",
     })
 
@@ -37,9 +37,16 @@ function Card_() {
             id="card"
             className="flex h-full w-[80%] basis-full flex-col rounded-md bg-white"
         >
-            <CardHeader cardData={cardData} />
+            <CardHeader
+                cardData={cardData}
+                flipper={() => setShowFront((prev) => !prev)}
+            />
             <CardTags cardData={cardData} />
-            {showFront ? <CardFront cardData={cardData} /> : <CardBack />}
+            {showFront ? (
+                <CardFront cardData={cardData} />
+            ) : (
+                <CardBack cardData={cardData} />
+            )}
         </div>
     )
 }

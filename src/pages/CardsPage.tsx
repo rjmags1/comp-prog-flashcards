@@ -79,8 +79,15 @@ export const tempCard: Card = {
     metadata: cards[0],
     title: "tempTitle",
     prompt: samplePrompt,
-    solution: "# Some Solution in Markdown\n\n" + lorem,
+    solutions: [],
     notes: "### Some Notes in Markdown\n\n" + lorem,
+}
+
+for (let i = 0; i < 4; i++) {
+    tempCard.solutions.push({
+        content: `# Some Solution ${i + 1} in Markdown\n\n` + lorem,
+        name: `solution-${i + 1}`,
+    })
 }
 
 export const DeckContext = createContext<DeckLevelContext | null>(null)

@@ -2,8 +2,9 @@ import { CardHeaderProps } from "../../types"
 import AddCardToDeckButton from "./AddCardToDeckButton"
 import DeleteCardFromDeckButton from "./DeleteCardFromDeckButton"
 import ToggleMasteryButton from "./ToggleMasteryButton"
+import { Tooltip } from "react-tooltip"
 
-function CardHeader({ cardData }: CardHeaderProps) {
+function CardHeader({ cardData, flipper }: CardHeaderProps) {
     return (
         <div
             id="card-header"
@@ -13,6 +14,17 @@ function CardHeader({ cardData }: CardHeaderProps) {
             <span className="no-wrap mr-2 w-max text-xl font-extrabold">
                 {cardData.title} - {cardData.metadata.difficulty}
             </span>
+            <Tooltip anchorId="flip-button" />
+            <button
+                onClick={() => flipper()}
+                data-tooltip-content="Click or type spacebar to flip"
+                id="flip-button"
+                className="h-fit rounded-md border border-black 
+                bg-slate-800 px-2 pb-1 text-xl leading-6 text-white 
+                hover:bg-slate-700"
+            >
+                ⟳
+            </button>
             <AddCardToDeckButton />
             <DeleteCardFromDeckButton />
             <ToggleMasteryButton status={false} />

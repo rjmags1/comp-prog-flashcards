@@ -16,3 +16,23 @@ html, body, #root {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
+
+.md-editor {
+    height: 100%;
+}
+
+.md-editor-content {
+    height: 100%;
+}
+
+.md-editor-content-editor {
+    height: 100%;
+}
+
+.cm-theme {
+    height: 100%;
+}
+
+.cm-editor {
+    height: 100%;
+}

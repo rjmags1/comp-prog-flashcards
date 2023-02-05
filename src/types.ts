@@ -145,6 +145,10 @@ export interface CardFrontProps {
     cardData: Card
 }
 
+export interface CardBackProps {
+    cardData: Card
+}
+
 export interface PromptProps {
     cardData: Card
 }
@@ -176,12 +180,23 @@ export interface DeckLevelContext {
     updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null
 }
 
+export interface Tab {
+    title: string
+    content: string
+    index: number
+}
+
 export interface Card {
     metadata: CardMetadata
     title: string
     prompt: string
-    solution: string
+    solutions: Solution[]
     notes: string
+}
+
+export interface Solution {
+    name: string
+    content: string
 }
 
 export interface CardMetadata {
@@ -201,6 +216,7 @@ export interface TagFilterProps {
 
 export interface CardHeaderProps {
     cardData: Card
+    flipper: () => void
 }
 
 export interface ScrollButtonProps {
