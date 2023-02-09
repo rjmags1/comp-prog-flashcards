@@ -46,6 +46,7 @@ function CardBack({ cardData }: CardBackProps) {
         if (tabs.length === 0) return
         if (addingNew) {
             setTabContent("")
+            setSelectedTab(null)
             return
         }
         if (selectedTab !== null && selectedTab.content !== tabContent) {
