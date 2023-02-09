@@ -22,7 +22,7 @@ tempTitles.forEach((t, i) => {
     tempTitlesMap.set(i + 1, t)
 })
 
-interface CardTitleOption {
+type CardTitleOption = {
     label: string
     value: string
     id: number
@@ -32,7 +32,7 @@ function CardTitleDatalist() {
     const [allTitles, setAllTitles] = useState<Map<number, string>>(new Map())
     const [searchText, setSearchText] = useState("")
     const deckContext = useContext(DeckContext) as DeckLevelContext
-    const { currentDeck, displayedCards, updater, currentCardId } = deckContext
+    const { currentDeck, filteredCards, updater, currentCardId } = deckContext
 
     useEffect(() => {
         if (allTitles.size > 0) return
@@ -45,10 +45,10 @@ function CardTitleDatalist() {
     const options: Options<CardTitleOption> =
         allTitles.size === 0
             ? []
-            : Array.from(displayedCards.keys())
+            : Array.from(filteredCards.keys())
                   .filter(
                       (id) =>
-                          displayedCards.has(id) &&
+                          filteredCards.has(id) &&
                           allTitles.get(id)!.indexOf(searchText) > -1
                   )
                   .map((id) => ({

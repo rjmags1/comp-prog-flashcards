@@ -1,6 +1,9 @@
 import { ToggleMasteryButtonProps } from "../../types"
 import { useState } from "react"
 
+// TODO:
+//   - tauri command for changing mastery status of question
+
 function ToggleMasteryButton({
     status: initialStatus,
 }: ToggleMasteryButtonProps) {

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { useCardBackHandleResize, useOutsideClickHandler } from "../../hooks"
 import { CardBackProps, Tab } from "../../types"
 import PopupMessage from "../general/PopupMessage"
-import NewTab from "./NewTab"
+import NewTabButton from "./NewTabButton"
 import Tab_ from "./Tab"
 
 function CardBack({ cardData }: CardBackProps) {
@@ -63,10 +63,13 @@ function CardBack({ cardData }: CardBackProps) {
                 ...prev.slice(selectedTab.index + 1),
             ])
         }
+        // tabIdx will be tabs.length when addingNew
         if (tabIdx < tabs.length) {
             setSelectedTab(tabs[tabIdx])
             setTabContent(tabs[tabIdx].content)
         }
+
+        return () => setEditMode(false)
     }, [tabIdx, tabs])
 
     useEffect(() => {
@@ -97,7 +100,7 @@ function CardBack({ cardData }: CardBackProps) {
                         clickHandler={() => setTabIdx(i)}
                     />
                 ))}
-                <NewTab
+                <NewTabButton
                     addingNew={addingNew}
                     opener={() => {
                         setEditMode(true)

@@ -8,6 +8,7 @@ import CardTags from "./CardTags"
 
 // TODO:
 //    - tauri command for fetching card prompt, solution, notes, title
+//    - handle currentCardId = -1 case for filters yielding empty card set
 
 function Card_() {
     const { currentCardId, cards } = useContext(DeckContext) as DeckLevelContext

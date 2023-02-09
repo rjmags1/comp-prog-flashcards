@@ -1,10 +1,10 @@
-import { useContext, useState } from "react"
+import { useContext } from "react"
 import { AppLevelContext, DeckLevelContext, TagFilterProps } from "../../types"
 import { AppContext } from "../../app/App"
 import { DeckContext } from "../../pages/CardsPage"
 import Select, { Options } from "react-select"
 
-interface TagFilterOption {
+type TagFilterOption = {
     value: string
     label: string
     id: number
@@ -40,7 +40,7 @@ function TagFilter({ tagType }: TagFilterProps) {
                 selected: false,
             }}
             onChange={(clicked) => {
-                let newFilterTags = new Set(filterTags)
+                const newFilterTags = new Set(filterTags)
                 if (clicked === null) {
                     for (const sid of selectedIds) newFilterTags.delete(sid)
                 } else {
@@ -52,7 +52,7 @@ function TagFilter({ tagType }: TagFilterProps) {
                     }
                 }
                 const newFilterTagsArr = Array.from(newFilterTags)
-                const newDisplayedCardsArr = Array.from(cards.entries()).filter(
+                const newFilteredCardsArr = Array.from(cards.entries()).filter(
                     ([_, metadata]) =>
                         newFilterTags.size === 0 ||
                         newFilterTagsArr.every((tagId) =>
@@ -62,10 +62,10 @@ function TagFilter({ tagType }: TagFilterProps) {
                 updater!({
                     ...deckContext,
                     filterTags: newFilterTags,
-                    displayedCards: new Map(newDisplayedCardsArr),
+                    filteredCards: new Map(newFilteredCardsArr),
                     currentCardId:
-                        newDisplayedCardsArr.length > 0
-                            ? newDisplayedCardsArr[0][0]
+                        newFilteredCardsArr.length > 0
+                            ? newFilteredCardsArr[0][0]
                             : -1,
                 })
             }}
@@ -115,6 +115,9 @@ function TagFilter({ tagType }: TagFilterProps) {
                 clearIndicator: (baseStyles, state) => ({
                     ...baseStyles,
                     color: "red",
+                    "&:hover": {
+                        cursor: "pointer",
+                    },
                 }),
             }}
         />

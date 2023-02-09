@@ -14,7 +14,7 @@ import ExitButton from "../general/ExitButton"
 // TODO:
 //    - get all users deck ids, names using user id in app context
 //          and whether or not card is in various decks (Tauri command)
-//    - add or remove decks via Tauri command based on user's selection
+//    - db add or remove decks via Tauri command based on user's selection
 
 type Option = {
     value: number

@@ -184,7 +184,7 @@ export interface AddTagToCardButtonProps {
 export interface DeckLevelContext {
     currentDeck: number
     cards: Map<number, CardMetadata>
-    displayedCards: Map<number, CardMetadata>
+    filteredCards: Map<number, CardMetadata>
     currentCardId: number
     filterTags: Set<number>
     updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null

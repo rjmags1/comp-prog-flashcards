@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext, useRef } from "react"
 import {
     DeckProps,
-    Deck,
     DecksLevelContext,
     AppLevelContext,
     Page,
@@ -128,7 +127,7 @@ function Deck_({ deck, blank }: DeckProps) {
                     }}
                 />
             ) : (
-                <h3 className="pt-4 text-3xl hover:cursor-default">
+                <h3 className="pt-4 text-3xl hover:cursor-pointer hover:opacity-70">
                     {deckName}
                 </h3>
             )}

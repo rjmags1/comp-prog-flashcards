@@ -128,7 +128,7 @@ function App() {
         users: tempUserMap,
         currentUser: 1,
         currentTheme: Theme.Default,
-        pageHistory: [[Page.Cards, 1]],
+        pageHistory: [[Page.Login, null]],
         tags: tempTags,
         updater: null,
     })

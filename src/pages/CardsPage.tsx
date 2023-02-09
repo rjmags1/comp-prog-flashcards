@@ -13,8 +13,7 @@ import { AppContext } from "../app/App"
 import Deck from "../components/cards/Deck"
 
 // TODO:
-//    - tauri command for fetching deck name all card metadata
-//        - for the deck with deckId
+//    - tauri command for fetching deck name + card metadata
 
 const cards: CardMetadata[] = [
     {
@@ -98,7 +97,7 @@ function CardsPage({ deckId }: CardsPageProps) {
     const [deckContext, setDeckContext] = useState<DeckLevelContext>({
         currentDeck: deckId,
         cards: tempCardsMap,
-        displayedCards: new Map(tempCardsMap),
+        filteredCards: new Map(tempCardsMap),
         currentCardId: 1,
         filterTags: new Set(),
         updater: null,

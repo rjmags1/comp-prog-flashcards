@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { NewTabProps } from "../../types"
 
-function NewTab({ addingNew, opener, saver, discarder }: NewTabProps) {
+function NewTabButton({ addingNew, opener, saver, discarder }: NewTabProps) {
     const [newTabTitle, setNewTabTitle] = useState("")
 
     return addingNew ? (
@@ -45,4 +45,4 @@ function NewTab({ addingNew, opener, saver, discarder }: NewTabProps) {
     )
 }
 
-export default NewTab
+export default NewTabButton

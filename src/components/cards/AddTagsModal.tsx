@@ -8,17 +8,17 @@ import ExitButton from "../general/ExitButton"
 
 // TODO: tauri command + logic for adding new tag association into db
 
-type Option = {
+type TagOption = {
     value: number
     label: string
 }
 
 function AddTagsModal({ cardTags, unrender, adder }: AddTagsModalProps) {
     const { tags } = useContext(AppContext) as AppLevelContext
-    const [addedTagOptions, setAddedTagOptions] = useState<Option[]>([])
+    const [addedTagOptions, setAddedTagOptions] = useState<TagOption[]>([])
 
     const cardTagIds = new Set(Array.from(cardTags.map((t) => t.id)))
-    const options: Option[] = Array.from(tags.entries())
+    const options: TagOption[] = Array.from(tags.entries())
         .filter(([id, _]) => !cardTagIds.has(id))
         .map(([id, tag]) => ({
             value: id,

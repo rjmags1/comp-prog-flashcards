@@ -4,6 +4,10 @@ import { AppContext } from "../../app/App"
 import { AppLevelContext, Page, TagType } from "../../types"
 import PopupMessage from "../general/PopupMessage"
 
+// TODO:
+//    - tauri command for updating user settings
+//    - tauri command for deleting user account
+
 type ThemeOption = {
     label: string
     value: string

@@ -11,11 +11,11 @@ function ScrollButton({ direction }: ScrollButtonProps) {
     const deckContext = useContext(DeckContext) as DeckLevelContext
 
     const scroll = () => {
-        const { displayedCards, currentCardId, updater } = deckContext
+        const { filteredCards, currentCardId, updater } = deckContext
         const step = direction === ScrollDirection.Prev ? -1 : 1
         updater!({
             ...deckContext,
-            currentCardId: nextCardId(currentCardId, displayedCards, step),
+            currentCardId: nextCardId(currentCardId, filteredCards, step),
         })
     }
 
