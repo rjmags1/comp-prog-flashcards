@@ -10,7 +10,7 @@ function PageHeader({ header, page }: PageHeaderProps) {
             <BackButton />
             <h1 className="text-4xl">{header}</h1>
             <div className="flex items-center gap-x-6">
-                <SettingsButton />
+                {page !== Page.Settings && <SettingsButton />}
                 {page === Page.Decks && <AddDeckButton />}
                 {page === Page.Cards && <AddCardButton />}
             </div>

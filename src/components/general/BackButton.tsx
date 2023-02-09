@@ -4,7 +4,7 @@ import { AppLevelContext, Page } from "../../types"
 
 function BackButton() {
     const appContext = useContext(AppContext) as AppLevelContext
-    const { pageHistory, updater } = appContext
+    const { pageHistory, updater, currentUser } = appContext
 
     const clickHandler = () => {
         let newHistory = [...pageHistory]
@@ -29,6 +29,7 @@ function BackButton() {
         updater!({
             ...appContext,
             pageHistory: newHistory,
+            currentUser: currPage === Page.Decks ? null : currentUser,
         })
     }
 

@@ -23,7 +23,7 @@ export enum TagType {
 }
 
 export enum Theme {
-    Default,
+    Default = "Default",
 }
 
 export enum ScrollDirection {
@@ -121,9 +121,9 @@ export interface User {
     id: number
     username: string
     avatarPath: string
-    theme: number
+    theme: Theme
     tagMask: number
-    hideDiffMask: number
+    hideDiffs: boolean
 }
 
 export interface UserListProps {
