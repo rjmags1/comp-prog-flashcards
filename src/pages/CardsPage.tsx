@@ -100,7 +100,6 @@ function CardsPage({ deckId }: CardsPageProps) {
         cards: tempCardsMap,
         displayedCards: new Map(tempCardsMap),
         currentCardId: 1,
-        addingNew: false,
         filterTags: new Set(),
         updater: null,
     })

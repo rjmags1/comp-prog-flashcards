@@ -11,7 +11,7 @@ import CardTags from "./CardTags"
 
 function Card_() {
     const { currentCardId, cards } = useContext(DeckContext) as DeckLevelContext
-    const [showFront, setShowFront] = useState(false)
+    const [showFront, setShowFront] = useState(true)
     const [cardData, setCardData] = useState<Card>({
         metadata: cards.get(currentCardId) as CardMetadata,
         title: "tempTitle",

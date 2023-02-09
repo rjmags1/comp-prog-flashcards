@@ -1,4 +1,5 @@
 import { ReactNode } from "react"
+import { StringLiteralType } from "typescript"
 
 ///////////////////////////
 ////////// ENUMS //////////
@@ -165,6 +166,16 @@ export interface AddTagsModalProps {
     adder: (newTags: Tag[]) => void
 }
 
+export interface AddCardModalProps {
+    unrender: (add: boolean, newCardInfo?: NewCardInfo) => void
+}
+
+export interface NewCardInfo {
+    title: string
+    source: string
+    difficulty: Difficulty
+}
+
 export interface AddTagToCardButtonProps {
     cardTags: Tag[]
     adder: (newTags: Tag[]) => void
@@ -175,7 +186,6 @@ export interface DeckLevelContext {
     cards: Map<number, CardMetadata>
     displayedCards: Map<number, CardMetadata>
     currentCardId: number
-    addingNew: boolean
     filterTags: Set<number>
     updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null
 }
