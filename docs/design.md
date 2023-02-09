@@ -1,3 +1,5 @@
+# Table of Contents
+
 - <a href="#techstack">Tech Stack</a>
 - <a href="#datamodel">Data Model</a>
     - <a href="#entities">Entities</a>
@@ -8,10 +10,14 @@
 <a id="techstack" href="#techstack" ><u><h1>Tech Stack</h1></u></a>
 
 - **Tauri (Rust)** - cross-platform desktop app framework, leverages webviews for making desktop UIs with web technologies
-- **React (TypeScript)** - frontend JS/TS UI framework; component-based, declarative
-- **TailwindCSS** - useful CSS utility classes and defaults
 - **SQLite** - embedded SQL database, simplifies disk i/o
 - **Diesel (Rust)** - ORM for safe, efficient interaction with SQLite
+- **React (TypeScript)** - frontend JS/TS UI framework; component-based, declarative
+- **tailwindCSS** - useful CSS utility classes and defaults
+- **react-select** - battle-tested, simplifies card filter and form implementations
+- **react-tooltip** - battle-tested, simplifies UI hint implementation
+- **Prettier** - convenient code autoformatting on save
+- **prettier-plugin-tailwindcss** - automatic priority-based sorting of tailwind classes
 
 <a id="datamodel" href="#datamodel" ><u><h1>Data Model</h1></u></a>
 
@@ -787,27 +793,32 @@ SELECT * FROM TagTypeEnum;
         - __**__ Write script that hits public Leetcode graphql API, reads relevant information and translates to raw sql for `up.sql` and `down.sql` diesel migration files (command-f 'up.sql' on https://diesel.rs/guides/getting-started).
         - See [Q10](#Q10), [Q13](#Q13), [Q31](#Q31), [Q32](#Q32), [Q33](#Q33). Generated SQL should be an aggregation of these.
 
-### Phase 2
+### **[ ✅ ]** Phase 2
 
 - **[ ✅ ]** Static react components - no interactivity or Tauri command invocations
     - Components should adhere to single responsibility principle, and reasonably balance reusability with interface overcomplication.
-    - See the [Component Tree (.png)](cpf-component-tree.png) ([.svg](cpf-component-tree.svg))
+    - See the Component Tree ([.png](cpf-component-tree.png)) ([.svg](cpf-component-tree.svg))
     - For markdown rendering and editing, see: https://github.com/uiwjs/react-markdown-preview and https://github.com/uiwjs/react-markdown-editor
 
 ### Phase 3
-- Wrapper functions for above queries (in-memory sqlite to mock the real thing) **[test]**
-- Tauri commands, which call query wrappers. How these commands get implemented will be clearer after finishing all static components. **[test]**
-- ## TODO: more details
+
+- Make the frontend call Tauri commands and add interactivity to the static components. **[test]**
+    - Go through each page of app and implement necessary commands for data fetching as needed
+    - Will need to use transactions for certain operations (add new card, etc.): https://docs.rs/diesel/latest/diesel/pg/struct.TransactionBuilder.html
+    - For certain commands just do a direct translation into diesel method calls, for others use query wrapper that call multiple separate diesel queries
+- The app should be a fully functional MVP after this phase.
 
 ### Phase 4
-
-- Make the frontend call the Tauri commands and add interactivity to the static components. **[test]**
-- The app should be a fully functional MVP after this phase.
+- Test all above functionality annotated as needing it
+- Playwright for e2e testing?
 - ## TODO: more details
 
 ### Phase 5
-- Test all above functionality annotated as needing it
-- Playwright for e2e testing?
+- Clean up the UI
+  - Make sure styles are completely consistent
+  - Implement hotkeys for certain actions (spacebar for card flip, arrow keys for scroll to next/prev card) 
+- Add tooltips where needed (hotkeys, hover descriptions, etc.)
+- Handle large filter tag lists (i.e. 5 selected paradigm tags)
 - ## TODO: more details
 
 ### Phase 6
