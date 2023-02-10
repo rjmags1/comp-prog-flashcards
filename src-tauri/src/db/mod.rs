@@ -1,5 +1,5 @@
 use diesel::sqlite::SqliteConnection;
-use diesel::{prelude::*};
+use diesel::prelude::*;
 
 const DATABASE_URL: &str = "sqlite://cpf.db";
 

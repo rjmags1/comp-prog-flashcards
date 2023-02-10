@@ -25,7 +25,7 @@ VALUES ("Normal"), ("Dark");
 CREATE TABLE Image (
     id INTEGER PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
-    image BLOB NOT NULL
+    path TEXT NOT NULL
 );
 
 CREATE TABLE User (

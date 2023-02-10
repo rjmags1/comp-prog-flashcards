@@ -1,4 +1,4 @@
-#![allow(non_snake_case)]
+// @generated automatically by Diesel CLI.
 
 diesel::table! {
     Card (id) {
@@ -66,7 +66,7 @@ diesel::table! {
     Image (id) {
         id -> Integer,
         name -> Text,
-        image -> Binary,
+        path -> Text,
     }
 }
 

@@ -24,9 +24,9 @@
 <h3><a href="#entities" id="entities">Entities</a></h3>
 
 - **Image**
-    - id - integer, PK
-    - name - text, not null
-    - image - blob, not null
+    - id - integer PK
+    - name - text not null
+    - path - text not null
 
 - **User**
     - id - integer PK
@@ -119,8 +119,10 @@ Note: Queries below will be executed via rust with `diesel::QueryDsl` ORM method
 SELECT 
     User.id AS id, 
     username, 
-    Image.image AS avatar, 
-    ThemeEnum.name
+    Image.path AS path, 
+    ThemeEnum.name,
+    tagmask,
+    hidediffs
 FROM 
     User
     LEFT JOIN Image 
