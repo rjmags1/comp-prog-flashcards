@@ -26,6 +26,10 @@ export enum Theme {
     Normal = "Normal",
     Dark = "Dark",
 }
+export const ThemeLookup: ReadonlyMap<string, Theme> = new Map([
+    ["Normal", Theme.Normal],
+    ["Dark", Theme.Dark],
+])
 
 export enum ScrollDirection {
     Prev,
@@ -77,6 +81,28 @@ export interface AppLevelContext {
     pageHistory: HistoryEntry[]
     tags: Map<number, Tag>
     updater: React.Dispatch<React.SetStateAction<AppLevelContext>> | null
+}
+
+export interface TagFetchData {
+    id: number
+    content: string | null
+    name: string
+    tag_type: TagType
+}
+
+export interface UserFetchData {
+    id: number
+    username: string
+    avatar_path: string
+    theme: string
+    tagmask: number
+    hidediffs: boolean
+}
+
+export interface AppContextFetchData {
+    tags: TagFetchData[]
+    themes: string[]
+    users: UserFetchData[]
 }
 
 ///////////////////////////
