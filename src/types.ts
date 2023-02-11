@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-import { StringLiteralType } from "typescript"
 
 ///////////////////////////
 ////////// ENUMS //////////
@@ -24,7 +23,8 @@ export enum TagType {
 }
 
 export enum Theme {
-    Default = "Default",
+    Normal = "Normal",
+    Dark = "Dark",
 }
 
 export enum ScrollDirection {

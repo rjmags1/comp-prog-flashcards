@@ -28,13 +28,16 @@ CREATE TABLE Image (
     path TEXT NOT NULL
 );
 
+INSERT INTO Image (name, path)
+VALUES ("default", "/default-avatar.png");
+
 CREATE TABLE User (
     id INTEGER PRIMARY KEY NOT NULL,
     username TEXT NOT NULL UNIQUE,
     avatar INTEGER DEFAULT 1,
     theme INTEGER DEFAULT 1,
-    tagmask INTEGER DEFAULT 0,
-    hidediffs BOOLEAN DEFAULT false,
+    tagmask INTEGER DEFAULT 0 NOT NULL,
+    hidediffs BOOLEAN DEFAULT false NOT NULL,
     FOREIGN KEY(avatar) REFERENCES Image(id),
     FOREIGN KEY(theme) REFERENCES ThemeEnum(enum_val)
 );
@@ -102,7 +105,8 @@ CREATE TABLE Tag (
     id INTEGER PRIMARY KEY NOT NULL,
     type INTEGER NOT NULL,
     name TEXT,
-    content TEXT
+    content TEXT,
+    FOREIGN KEY(type) REFERENCES TagTypeEnum(enum_val)
 );
 
 CREATE TABLE Card_Tag (

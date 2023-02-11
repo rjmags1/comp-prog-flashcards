@@ -116,8 +116,8 @@ diesel::table! {
         username -> Text,
         avatar -> Nullable<Integer>,
         theme -> Nullable<Integer>,
-        tagmask -> Nullable<Integer>,
-        hidediffs -> Nullable<Bool>,
+        tagmask -> Integer,
+        hidediffs -> Bool,
     }
 }
 
@@ -127,6 +127,7 @@ diesel::joinable!(Card_Tag -> Card (card));
 diesel::joinable!(Card_Tag -> Tag (tag));
 diesel::joinable!(Deck -> User (user));
 diesel::joinable!(Solution -> CardBack (cardback));
+diesel::joinable!(Tag -> TagTypeEnum (type_));
 diesel::joinable!(User -> Image (avatar));
 diesel::joinable!(User -> ThemeEnum (theme));
 

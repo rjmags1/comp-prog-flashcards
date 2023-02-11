@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import PageSwitch from "./PageSwitch"
 import { AppLevelContext, Page, Tag, TagType, Theme, User } from "../types"
 import "react-tooltip/dist/react-tooltip.css"
+import { invoke } from "@tauri-apps/api/tauri"
 
 // TODO:
 // impl fetching of all user info and all existing tags (tags
@@ -14,7 +15,7 @@ const tempUsers: User[] = [
         id: 1,
         username: "user1",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 4,
         hideDiffs: false,
     },
@@ -22,7 +23,7 @@ const tempUsers: User[] = [
         id: 2,
         username: "user2",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -30,7 +31,7 @@ const tempUsers: User[] = [
         id: 3,
         username: "user3",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -38,7 +39,7 @@ const tempUsers: User[] = [
         id: 4,
         username: "user4",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -46,7 +47,7 @@ const tempUsers: User[] = [
         id: 5,
         username: "user5",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -54,7 +55,7 @@ const tempUsers: User[] = [
         id: 6,
         username: "user6",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -62,7 +63,7 @@ const tempUsers: User[] = [
         id: 7,
         username: "user7",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -70,7 +71,7 @@ const tempUsers: User[] = [
         id: 8,
         username: "user8",
         avatarPath: "./default-avatar.png",
-        theme: Theme.Default,
+        theme: Theme.Normal,
         tagMask: 0,
         hideDiffs: false,
     },
@@ -124,17 +125,24 @@ tags.forEach((t) => tempTags.set(t.id, t))
 
 function App() {
     const [appContext, setAppContext] = useState<AppLevelContext>({
-        themes: [Theme.Default],
+        themes: [Theme.Normal],
         users: tempUserMap,
         currentUser: 1,
-        currentTheme: Theme.Default,
+        currentTheme: Theme.Normal,
         pageHistory: [[Page.Login, null]],
         tags: tempTags,
         updater: null,
     })
 
+    const invoker = async () => {
+        const asdf = await invoke("load_app_context")
+        console.log(asdf)
+    }
+
     useEffect(() => {
         if (appContext.updater !== null) return
+
+        invoker()
 
         setAppContext((initialAppContext) => ({
             ...initialAppContext,
