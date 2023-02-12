@@ -5,7 +5,6 @@ import {
     AppLevelContext,
     Page,
     Tag,
-    TagType,
     Theme,
     ThemeLookup,
     User,

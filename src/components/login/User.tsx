@@ -1,10 +1,13 @@
 import { AppLevelContext, Page, User } from "../../types"
 import { AppContext } from "../../app/App"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
+import { appDataDir, join } from "@tauri-apps/api/path"
+import { convertFileSrc } from "@tauri-apps/api/tauri"
 
 function User_(userInfo: User) {
     const appContext = useContext(AppContext) as AppLevelContext
     const { updater, pageHistory } = appContext
+    const [imageSrc, setImageSrc] = useState("")
 
     const clickHandler = () => {
         updater!({
@@ -14,7 +17,19 @@ function User_(userInfo: User) {
         })
     }
 
-    const { avatarPath, username } = userInfo
+    useEffect(() => {
+        const imagePathToSrc = async () => {
+            const { avatarPath } = userInfo
+            console.log(avatarPath)
+            const base = await appDataDir()
+            const path = await join(base, avatarPath)
+            setImageSrc(convertFileSrc(path))
+        }
+
+        imagePathToSrc()
+    }, [])
+
+    console.log(imageSrc)
     return (
         <div
             className="flex flex-col items-center justify-center text-sm
@@ -25,9 +40,9 @@ function User_(userInfo: User) {
                 className="flex items-center justify-center
                  overflow-hidden rounded-full hover:cursor-pointer"
             >
-                <img src={avatarPath} width="64" />
+                <img src={imageSrc} width="64" />
             </div>
-            {username}
+            {userInfo.username}
         </div>
     )
 }

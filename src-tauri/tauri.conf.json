@@ -12,7 +12,18 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false
+        "path": {
+            "all": true
+        },
+        "fs": {
+            "all": true,
+            "scope": ["$APPDATA/images/*", "$APPDATA/images"]
+        },
+        "protocol": {
+            "all": false,
+            "asset": true,
+            "assetScope": ["$APPDATA/**/*"]
+        }
     },
     "bundle": {
       "active": true,
@@ -48,7 +59,7 @@
       }
     },
     "security": {
-      "csp": null
+        "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
     },
     "updater": {
       "active": false

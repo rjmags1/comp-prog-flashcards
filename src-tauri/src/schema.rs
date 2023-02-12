@@ -115,7 +115,7 @@ diesel::table! {
         id -> Integer,
         username -> Text,
         avatar -> Nullable<Integer>,
-        theme -> Nullable<Integer>,
+        theme -> Integer,
         tagmask -> Integer,
         hidediffs -> Bool,
     }

@@ -1,18 +1,25 @@
+use std::error::Error;
+
+use diesel::connection::SimpleConnection;
 use diesel::sqlite::SqliteConnection;
-use diesel::prelude::*;
+use diesel::{ prelude::*, insert_into };
 use crate::schema;
 
 const DATABASE_URL: &str = "sqlite://cpf.db";
 
 pub fn establish_connection() -> SqliteConnection {
-    SqliteConnection::establish(DATABASE_URL).unwrap_or_else(|_|
+    let mut conn = SqliteConnection::establish(DATABASE_URL).unwrap_or_else(|_|
         panic!("Error connecting to database")
-    )
+    );
+    conn.batch_execute("PRAGMA foreign_keys = ON").expect("fk pragma failed");
+    let conn = conn;
+
+    conn
 }
 
 #[derive(serde::Serialize)]
 #[derive(Debug)]
-struct UserData {
+pub struct UserData {
     pub id: i32,
     pub username: String,
     pub avatar_path: String,
@@ -42,11 +49,7 @@ type UserInfoRow = (i32, String, i32, bool, Option<String>, Option<String>);
 type TagRow = (i32, Option<String>, Option<String>, Option<String>);
 
 pub fn load_app_context() -> AppContextDbData {
-    use schema::ThemeEnum;
-    use schema::User;
-    use schema::Image;
-    use schema::Tag;
-    use schema::TagTypeEnum;
+    use schema::{ ThemeEnum, User, Image, Tag, TagTypeEnum };
     let conn = &mut establish_connection();
 
     let theme_rows = ThemeEnum::table.load::<ThemeEnumRow>(conn).unwrap();
@@ -63,7 +66,12 @@ pub fn load_app_context() -> AppContextDbData {
         .load::<UserInfoRow>(conn)
         .unwrap();
     let tag_rows = Tag::table.left_join(TagTypeEnum::table)
-        .select((Tag::id, Tag::name, Tag::content, TagTypeEnum::name.nullable()))
+        .select((
+            Tag::id,
+            Tag::name,
+            Tag::content,
+            TagTypeEnum::name.nullable(),
+        ))
         .load::<TagRow>(conn)
         .unwrap();
 
@@ -93,4 +101,75 @@ pub fn load_app_context() -> AppContextDbData {
         .collect();
 
     AppContextDbData { themes, users, tags }
+}
+
+pub fn add_user(
+    username: String,
+    default_avatar: bool,
+    avatar_path: String,
+    avatar_name: String,
+    prefill_deck: bool
+) -> Result<UserData, Box<dyn Error>> {
+    let conn = &mut establish_connection();
+    use schema::{ User, Deck, Image, Card, Card_Deck };
+
+    let mut avatar_id = 1;
+    if !default_avatar {
+        insert_into(Image::table)
+            .values((
+                Image::name.eq(&avatar_name),
+                Image::path.eq(&avatar_path),
+            ))
+            .execute(conn)?;
+        avatar_id = Image::table.select(Image::id)
+            .order(Image::id.desc())
+            .limit(1)
+            .load::<i32>(conn)
+            .unwrap()[0];
+    }
+
+    insert_into(User::table)
+        .values((User::username.eq(&username), User::avatar.eq(avatar_id)))
+        .execute(conn)?;
+    let user_id = User::table.select(User::id)
+        .order(User::id.desc())
+        .limit(1)
+        .load(conn)
+        .unwrap()[0];
+
+    if prefill_deck {
+        insert_into(Deck::table)
+            .values((Deck::name.eq("Deck 1"), Deck::user.eq(user_id)))
+            .execute(conn)?;
+        let deck_id = Deck::table.select(Deck::id)
+            .order(Deck::id.desc())
+            .limit(1)
+            .load::<i32>(conn)
+            .unwrap()[0];
+
+        let shipped_card_ids = Card::table.filter(Card::shipped.eq(true))
+            .select(Card::id)
+            .load::<i32>(conn)
+            .unwrap();
+        let mut card_deck_rows = vec![(
+            Card_Deck::card.eq(shipped_card_ids[0]),
+            Card_Deck::deck.eq(deck_id),
+        )];
+        for i in 1..shipped_card_ids.len() {
+            card_deck_rows.push((
+                Card_Deck::card.eq(shipped_card_ids[i]),
+                Card_Deck::deck.eq(deck_id),
+            ));
+        }
+        insert_into(Card_Deck::table).values(card_deck_rows).execute(conn)?;
+    }
+
+    Ok(UserData {
+        id: user_id,
+        username,
+        avatar_path,
+        theme: String::from("Normal"),
+        tagmask: 0,
+        hidediffs: false,
+    })
 }
