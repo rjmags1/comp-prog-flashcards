@@ -20,7 +20,6 @@ function User_(userInfo: User) {
     useEffect(() => {
         const imagePathToSrc = async () => {
             const { avatarPath } = userInfo
-            console.log(avatarPath)
             const base = await appDataDir()
             const path = await join(base, avatarPath)
             setImageSrc(convertFileSrc(path))
@@ -29,7 +28,6 @@ function User_(userInfo: User) {
         imagePathToSrc()
     }, [])
 
-    console.log(imageSrc)
     return (
         <div
             className="flex flex-col items-center justify-center text-sm

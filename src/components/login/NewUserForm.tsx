@@ -16,11 +16,6 @@ import {
     createDir,
 } from "@tauri-apps/api/fs"
 
-// TODO:
-// - tauri command to add new users to sqlite and update ui accordingly
-//      - tauri fs, path APIs to handle avatar
-// - logic for handling duplicate username, other problems with user add
-
 const DEFAULT_AVATAR_NAME = "default"
 const DEFAULT_AVATAR_PATH = "images/default-avatar.png"
 
