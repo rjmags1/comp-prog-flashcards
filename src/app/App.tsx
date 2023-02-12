@@ -49,26 +49,17 @@ function App() {
                 newThemes.push(ThemeLookup.get(theme)!)
             })
             const newUsers: Map<number, User> = new Map()
-            users
-                .filter((user) => user.id > 1)
-                .forEach(
-                    ({
+            users.forEach(
+                ({ id, username, avatar_path, theme, tagmask, hidediffs }) =>
+                    newUsers.set(id, {
                         id,
                         username,
-                        avatar_path,
-                        theme,
-                        tagmask,
-                        hidediffs,
-                    }) =>
-                        newUsers.set(id, {
-                            id,
-                            username,
-                            avatarPath: avatar_path,
-                            theme: theme as Theme,
-                            tagMask: tagmask,
-                            hideDiffs: hidediffs,
-                        })
-                )
+                        avatarPath: avatar_path,
+                        theme: theme as Theme,
+                        tagMask: tagmask,
+                        hideDiffs: hidediffs,
+                    })
+            )
             setAppContext((initialAppContext) => ({
                 ...initialAppContext,
                 tags: newTags,

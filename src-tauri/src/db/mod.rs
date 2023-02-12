@@ -173,3 +173,41 @@ pub fn add_user(
         hidediffs: false,
     })
 }
+
+#[derive(serde::Serialize)]
+pub struct DeckData {
+    pub id: i32,
+    pub name: String,
+    pub user: i32,
+    pub size: i32,
+    pub mastered: i32,
+}
+
+#[derive(serde::Serialize)]
+pub struct UserDecksData {
+    pub decks: Vec<DeckData>,
+}
+
+type DeckRow = (i32, String, i32, i32, i32);
+
+pub fn load_user_decks(user_id: i32) -> UserDecksData {
+    use schema::Deck;
+    let conn = &mut establish_connection();
+
+    let user_decks = Deck::table.filter(Deck::user.eq(user_id))
+        .load::<DeckRow>(conn)
+        .unwrap();
+
+    UserDecksData {
+        decks: user_decks
+            .into_iter()
+            .map(|row| DeckData {
+                id: row.0,
+                name: row.1,
+                user: row.2,
+                size: row.3,
+                mastered: row.4,
+            })
+            .collect(),
+    }
+}

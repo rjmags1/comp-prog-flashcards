@@ -4,7 +4,7 @@
     windows_subsystem = "windows"
 )]
 
-use app::database;
+use app::database::{ self, UserDecksData };
 
 #[tauri::command]
 fn load_app_context() -> database::AppContextDbData {
@@ -32,10 +32,21 @@ fn add_user(
     }
 }
 
+#[tauri::command]
+fn load_user_decks(user_id: i32) -> UserDecksData {
+    database::load_user_decks(user_id)
+}
+
 fn main() {
     tauri::Builder
         ::default()
-        .invoke_handler(tauri::generate_handler![load_app_context, add_user])
+        .invoke_handler(
+            tauri::generate_handler![
+                load_app_context,
+                add_user,
+                load_user_decks
+            ]
+        )
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

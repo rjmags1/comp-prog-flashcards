@@ -5,9 +5,9 @@ diesel::table! {
         id -> Integer,
         front -> Integer,
         back -> Integer,
-        mastered -> Nullable<Bool>,
+        mastered -> Bool,
         source -> Nullable<Integer>,
-        shipped -> Nullable<Bool>,
+        shipped -> Bool,
         difficulty -> Integer,
     }
 }
@@ -50,8 +50,8 @@ diesel::table! {
         id -> Integer,
         name -> Text,
         user -> Integer,
-        size -> Nullable<Integer>,
-        mastered -> Nullable<Integer>,
+        size -> Integer,
+        mastered -> Integer,
     }
 }
 
