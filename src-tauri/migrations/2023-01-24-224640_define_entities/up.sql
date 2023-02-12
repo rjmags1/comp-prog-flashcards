@@ -46,8 +46,8 @@ CREATE TABLE Deck (
     id INTEGER PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
     user INTEGER NOT NULL,
-    size INTEGER DEFAULT 0,
-    mastered INTEGER DEFAULT 0,
+    size INTEGER DEFAULT 0 NOT NULL,
+    mastered INTEGER DEFAULT 0 NOT NULL,
     FOREIGN KEY(user) REFERENCES User(id) ON DELETE CASCADE,
     UNIQUE (name, user)
 );
@@ -61,9 +61,9 @@ CREATE TABLE Card (
     id INTEGER PRIMARY KEY NOT NULL,
     front INTEGER NOT NULL UNIQUE,
     back INTEGER NOT NULL UNIQUE,
-    mastered BOOLEAN DEFAULT false,
+    mastered BOOLEAN DEFAULT false NOT NULL,
     source INTEGER,
-    shipped BOOLEAN DEFAULT false,
+    shipped BOOLEAN DEFAULT false NOT NULL,
     difficulty INTEGER NOT NULL,
     FOREIGN KEY(front) REFERENCES CardFront(id),
     FOREIGN KEY(back) REFERENCES CardBack(id),

@@ -183,8 +183,8 @@ diff_enum = {"Easy": 1, "Medium": 2, "Hard": 3}
 
 with open('up.sql', 'w') as f:
     print('INSERT INTO Source (name) VALUES ("Leetcode");\n', file=f)
-    print('INSERT INTO User (username) VALUES ("");\n', file=f)
-    print('INSERT INTO Deck (name, user) VALUES ("", 1);\n', file=f)
+    print('INSERT INTO User (username) VALUES ("dev");\n', file=f)
+    print('INSERT INTO Deck (name, user) VALUES ("devDeck", 1);\n', file=f)
     print('UPDATE Deck SET size = 2547 WHERE id = 1;', file=f)
 
     print('INSERT INTO Tag (type, name, content)', file=f)
