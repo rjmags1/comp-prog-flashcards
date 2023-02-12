@@ -200,9 +200,9 @@ with open('up.sql', 'w') as f:
 
         print(f'INSERT INTO CardBack (notes, card) VALUES ("", {id});\n', file=f)
 
-        print('INSERT INTO Card (front, back, difficulty, source)', file=f)
+        print('INSERT INTO Card (front, back, difficulty, source, shipped)', file=f)
         print('VALUES', file=f)
-        print(f'({id}, {id}, {diff_enum[diff]}, {1});\n', file=f)
+        print(f'({id}, {id}, {diff_enum[diff]}, {1}, TRUE);\n', file=f)
 
         print(f'INSERT INTO Card_Deck (card, deck) VALUES ({id}, 1);', file=f)
 

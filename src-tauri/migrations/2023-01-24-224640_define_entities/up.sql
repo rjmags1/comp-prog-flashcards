@@ -29,13 +29,13 @@ CREATE TABLE Image (
 );
 
 INSERT INTO Image (name, path)
-VALUES ("default", "/default-avatar.png");
+VALUES ("default", "images/default-avatar.png");
 
 CREATE TABLE User (
     id INTEGER PRIMARY KEY NOT NULL,
     username TEXT NOT NULL UNIQUE,
     avatar INTEGER DEFAULT 1,
-    theme INTEGER DEFAULT 1,
+    theme INTEGER DEFAULT 1 NOT NULL,
     tagmask INTEGER DEFAULT 0 NOT NULL,
     hidediffs BOOLEAN DEFAULT false NOT NULL,
     FOREIGN KEY(avatar) REFERENCES Image(id),
