@@ -301,7 +301,6 @@ export interface DeckProps {
 export interface Deck {
     id: number
     name: string
-    deleted: boolean
     user: number
     size: number
     mastered: number

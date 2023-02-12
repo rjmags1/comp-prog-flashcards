@@ -7,7 +7,6 @@ import {
     AppLevelContext,
     DeckLevelContext,
 } from "../../types"
-import { tempDecks } from "../../pages/DecksPage"
 import { DeckContext } from "../../pages/CardsPage"
 import ExitButton from "../general/ExitButton"
 
@@ -21,11 +20,6 @@ type Option = {
     label: string
 }
 
-const tempDeckIds: Options<Option> = tempDecks.map((d) => ({
-    value: d.id,
-    label: d.name,
-}))
-
 function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
     const { currentUser } = useContext(AppContext) as AppLevelContext
     const { currentDeck } = useContext(DeckContext) as DeckLevelContext
@@ -37,7 +31,8 @@ function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
 
         // tauri command invocation to get all deck ids
 
-        setDecks(tempDeckIds.filter((d) => d.value !== currentDeck))
+        //setDecks(tempDeckIds.filter((d) => d.value !== currentDeck))
+        setDecks([])
     })
 
     const handleAdd = () => {

@@ -4,7 +4,7 @@
     windows_subsystem = "windows"
 )]
 
-use app::database::{ self, UserDecksData };
+use app::database;
 
 #[tauri::command]
 fn load_app_context() -> database::AppContextDbData {
@@ -33,8 +33,41 @@ fn add_user(
 }
 
 #[tauri::command]
-fn load_user_decks(user_id: i32) -> UserDecksData {
+fn load_user_decks(user_id: i32) -> database::UserDecksData {
     database::load_user_decks(user_id)
+}
+
+#[tauri::command]
+fn update_deck(
+    deck_id: i32,
+    name: String,
+    size: i32,
+    mastered: i32
+) -> Result<database::DeckData, String> {
+    let update_result = database::update_deck(deck_id, name, size, mastered);
+    match update_result {
+        Ok(updated_deck) => Ok(updated_deck),
+        Err(e) => Err(format!("Deck update failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn delete_deck(deck_id: i32) -> Result<i32, String> {
+    let delete_result = database::delete_deck(deck_id);
+    match delete_result {
+        Ok(deleted_id) => Ok(deleted_id),
+        Err(e) => Err(format!("Deck delete failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn add_deck(name: String, user: i32) -> Result<database::DeckData, String> {
+    let add_result = database::add_deck(name, user);
+
+    match add_result {
+        Ok(added_deck) => Ok(added_deck),
+        Err(e) => Err(format!("Deck add failure: {}", e)),
+    }
 }
 
 fn main() {
@@ -44,7 +77,10 @@ fn main() {
             tauri::generate_handler![
                 load_app_context,
                 add_user,
-                load_user_decks
+                load_user_decks,
+                update_deck,
+                delete_deck,
+                add_deck
             ]
         )
         .run(tauri::generate_context!())

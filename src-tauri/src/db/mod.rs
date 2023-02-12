@@ -211,3 +211,63 @@ pub fn load_user_decks(user_id: i32) -> UserDecksData {
             .collect(),
     }
 }
+
+pub fn update_deck(
+    deck_id: i32,
+    name: String,
+    size: i32,
+    mastered: i32
+) -> Result<DeckData, Box<dyn Error>> {
+    use schema::Deck;
+    let conn = &mut establish_connection();
+
+    diesel
+        ::update(Deck::table.filter(Deck::id.eq(deck_id)))
+        .set((
+            Deck::name.eq(name),
+            Deck::size.eq(size),
+            Deck::mastered.eq(mastered),
+        ))
+        .execute(conn)?;
+    let updated = &Deck::table.filter(Deck::id.eq(deck_id)).load::<DeckRow>(
+        conn
+    )?[0];
+
+    Ok(DeckData {
+        id: updated.0,
+        name: updated.1.clone(),
+        user: updated.2,
+        size: updated.3,
+        mastered: updated.4,
+    })
+}
+
+pub fn delete_deck(deck_id: i32) -> Result<i32, Box<dyn Error>> {
+    use schema::Deck;
+    let conn = &mut establish_connection();
+
+    diesel::delete(Deck::table.filter(Deck::id.eq(deck_id))).execute(conn)?;
+
+    Ok(deck_id)
+}
+
+pub fn add_deck(name: String, user: i32) -> Result<DeckData, Box<dyn Error>> {
+    use schema::Deck;
+    let conn = &mut establish_connection();
+
+    diesel
+        ::insert_into(Deck::table)
+        .values((Deck::name.eq(name), Deck::user.eq(user)))
+        .execute(conn)?;
+    let inserted = &Deck::table.order_by(Deck::id.desc())
+        .limit(1)
+        .load::<DeckRow>(conn)?[0];
+
+    Ok(DeckData {
+        id: inserted.0,
+        name: inserted.1.clone(),
+        user: inserted.2,
+        size: inserted.3,
+        mastered: inserted.4,
+    })
+}

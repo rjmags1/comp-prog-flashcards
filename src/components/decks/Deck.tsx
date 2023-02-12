@@ -4,15 +4,13 @@ import {
     DecksLevelContext,
     AppLevelContext,
     Page,
+    Deck,
 } from "../../types"
 import BlankDeck from "./BlankDeck"
 import PopupMessage from "../general/PopupMessage"
 import { DecksContext } from "../../pages/DecksPage"
 import { AppContext } from "../../app/App"
-
-// TODO:
-//    - save edited titles to sqlite via Tauri command
-//    - delete deck from db on delete button click and popup confirm
+import { invoke } from "@tauri-apps/api"
 
 function Deck_({ deck, blank }: DeckProps) {
     let name = null,
@@ -26,22 +24,55 @@ function Deck_({ deck, blank }: DeckProps) {
     const [editing, setEditing] = useState(false)
     const [deckName, setDeckName] = useState(name)
     const [renderDeletePopup, setRenderDeletePopup] = useState(false)
+    const [updateError, setUpdateError] = useState("")
     const [deleted, setDeleted] = useState(false)
     const decksContext = useContext(DecksContext) as DecksLevelContext
     const appContext = useContext(AppContext) as AppLevelContext
 
     useEffect(() => {
         if (deleted) {
-            // tauri command logic placeholder
-            const { updater, decks } = decksContext
-            const without = new Map(decks)
-            without.delete(id)
-            updater!({
-                ...decksContext,
-                decks: without,
-            })
+            const deleteDeck = async () => {
+                try {
+                    const deletedId: number = await invoke("delete_deck", {
+                        deckId: id,
+                    })
+                    const { updater, decks } = decksContext
+                    const without = new Map(decks)
+                    without.delete(deletedId)
+                    updater!({
+                        ...decksContext,
+                        decks: without,
+                    })
+                    setEditing(false)
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+
+            deleteDeck()
         }
     }, [deleted])
+
+    const updateDeckName = async () => {
+        try {
+            const updated: Deck = await invoke("update_deck", {
+                deckId: id,
+                name: deckName,
+                size,
+                mastered,
+            })
+            const { updater, decks } = decksContext
+            const newDecks = new Map(decks)
+            newDecks.set(id, updated)
+            updater!({
+                ...decksContext,
+                decks: newDecks,
+            })
+            setEditing(false)
+        } catch (e) {
+            setUpdateError(e as string)
+        }
+    }
 
     const unrenderPopup = (d?: boolean) => {
         setDeleted(d as boolean)
@@ -63,9 +94,9 @@ function Deck_({ deck, blank }: DeckProps) {
 
     const masteredStr = `${mastered} / ${size} mastered`
 
-    if (blank) return <BlankDeck />
-
-    return (
+    return blank ? (
+        <BlankDeck />
+    ) : (
         <div
             onClick={handleDeckClick}
             className="flex h-60 w-72 flex-col items-center justify-start
@@ -79,13 +110,21 @@ function Deck_({ deck, blank }: DeckProps) {
                     unrender={unrenderPopup}
                 />
             )}
+            {updateError && (
+                <PopupMessage
+                    whiteText
+                    confirm
+                    message={`Update failed due to ${updateError}. Consider using a different name`}
+                    unrender={() => setUpdateError("")}
+                />
+            )}
             <div className="w-full text-right">
                 {editing ? (
                     <div className="flex items-center justify-end">
                         <button
                             onClick={(e) => {
                                 e.stopPropagation()
-                                setEditing(false)
+                                updateDeckName()
                             }}
                             className="py-4 pr-3 text-3xl 
                             font-bold text-green-600 hover:text-green-800"
