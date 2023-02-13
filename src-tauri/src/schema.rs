@@ -121,6 +121,7 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(Card -> DifficultyEnum (difficulty));
 diesel::joinable!(Card_Deck -> Card (card));
 diesel::joinable!(Card_Deck -> Deck (deck));
 diesel::joinable!(Card_Tag -> Card (card));

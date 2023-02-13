@@ -16,7 +16,7 @@ function CardFront({ cardData }: CardFrontProps) {
     } = useOutsideClickHandler(false)
 
     useEffect(() => {
-        if (cardData.prompt.length > 0) setPrompt(cardData.prompt)
+        setPrompt(cardData.prompt)
     }, [cardData])
 
     return editMode ? (

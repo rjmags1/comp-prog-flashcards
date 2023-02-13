@@ -1,6 +1,6 @@
 import { AppContext } from "../../app/App"
 import { AppLevelContext, CardTagsProps, Tag, colors } from "../../types"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import Tag_ from "./Tag"
 import AddTagToCardButton from "./AddTagToCardButton"
 
@@ -11,9 +11,13 @@ const shuffledColors = new Array(...colors).sort(
 function CardTags({ cardData }: CardTagsProps) {
     const appContext = useContext(AppContext) as AppLevelContext
     const { tags } = appContext
-    const [cardTags, setCardTags] = useState<Tag[]>(
-        Array.from(cardData.metadata.tags).map((tagId) => tags.get(tagId)!)
-    )
+    const [cardTags, setCardTags] = useState<Tag[]>([])
+
+    useEffect(() => {
+        setCardTags(
+            Array.from(cardData.metadata.tags).map((tagId) => tags.get(tagId)!)
+        )
+    }, [cardData])
 
     return (
         <div
@@ -34,7 +38,7 @@ function CardTags({ cardData }: CardTagsProps) {
                     color={shuffledColors[i % colors.length]}
                     remover={() =>
                         setCardTags((prev) =>
-                            Array.from(prev).filter((t) => t.id != td.id)
+                            Array.from(prev).filter((t) => t.id !== td.id)
                         )
                     }
                 />

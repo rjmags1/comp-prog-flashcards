@@ -4,6 +4,7 @@ import {
     AppContextFetchData,
     AppLevelContext,
     Page,
+    Source,
     Tag,
     Theme,
     ThemeLookup,
@@ -19,6 +20,7 @@ function App() {
         themes: [],
         users: new Map(),
         currentUser: null,
+        sources: new Map(),
         currentTheme: Theme.Normal,
         pageHistory: [[Page.Login, null]],
         tags: new Map(),
@@ -29,7 +31,7 @@ function App() {
         if (appContext.updater !== null) return
 
         const appContextSetter = async () => {
-            const { tags, themes, users } = (await invoke(
+            const { tags, themes, users, sources } = (await invoke(
                 "load_app_context"
             )) as AppContextFetchData
             const newTags: Map<number, Tag> = new Map()
@@ -60,11 +62,15 @@ function App() {
                         hideDiffs: hidediffs,
                     })
             )
+            const newSources: Map<number, Source> = new Map()
+            sources.forEach((source) => newSources.set(source.id, source))
+
             setAppContext((initialAppContext) => ({
                 ...initialAppContext,
                 tags: newTags,
                 themes: newThemes,
                 users: newUsers,
+                sources: newSources,
                 updater: setAppContext,
             }))
         }

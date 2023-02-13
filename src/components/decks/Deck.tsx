@@ -45,7 +45,7 @@ function Deck_({ deck, blank }: DeckProps) {
                     })
                     setEditing(false)
                 } catch (e) {
-                    console.log(e)
+                    console.error(e)
                 }
             }
 

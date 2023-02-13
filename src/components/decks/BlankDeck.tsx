@@ -27,7 +27,7 @@ function BlankDeck() {
             })
             setAddDeckError("")
         } catch (e) {
-            console.log(e)
+            console.error(e)
             setAddDeckError(e as string)
         }
     }

@@ -18,31 +18,7 @@ function AddCardButton() {
                 +
             </button>
             {renderModal && (
-                <AddCardModal
-                    unrender={(add, newCardInfo) => {
-                        setRenderModal(false)
-                        if (add) {
-                            // write to db with tauri command using newCardInfo
-
-                            const newCards = new Map(cards)
-                            newCards.set(cards.size + 1, {
-                                id: cards.size + 1, // from tauri return
-                                front: cards.size + 1, // from tauri return
-                                back: cards.size + 1, // from tauri return
-                                mastered: false,
-                                source: "Leetcode", // from tauri return
-                                shipped: false,
-                                difficulty: Difficulty.Easy, // from tauri return
-                                tags: new Set(),
-                            })
-                            updater!({
-                                ...deckContext,
-                                cards: newCards,
-                                currentCardId: cards.size + 1,
-                            })
-                        }
-                    }}
-                />
+                <AddCardModal unrender={() => setRenderModal(false)} />
             )}
         </>
     )

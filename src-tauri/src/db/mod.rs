@@ -1,19 +1,22 @@
-use std::collections::{ HashMap, HashSet };
+use std::collections::HashMap;
 use std::error::Error;
 
 use diesel::connection::SimpleConnection;
 use diesel::sqlite::SqliteConnection;
-use diesel::{ prelude::*, insert_into };
+use diesel::{ prelude::*, insert_into, update };
 use crate::schema;
-use crate::schema::CardBack::card;
 
 const DATABASE_URL: &str = "sqlite://cpf.db";
 
-pub fn establish_connection() -> SqliteConnection {
+pub fn establish_connection(fk: bool) -> SqliteConnection {
     let mut conn = SqliteConnection::establish(DATABASE_URL).unwrap_or_else(|_|
         panic!("Error connecting to database")
     );
-    conn.batch_execute("PRAGMA foreign_keys = ON").expect("fk pragma failed");
+    if fk {
+        conn.batch_execute("PRAGMA foreign_keys = ON").expect(
+            "fk pragma failed"
+        );
+    }
     let conn = conn;
 
     conn
@@ -32,7 +35,7 @@ pub struct UserData {
 
 #[derive(serde::Serialize)]
 #[derive(Debug)]
-struct TagData {
+pub struct TagData {
     pub id: i32,
     pub tag_type: String,
     pub name: String,
@@ -41,18 +44,26 @@ struct TagData {
 
 #[derive(serde::Serialize)]
 pub struct AppContextDbData {
-    themes: Vec<String>,
-    users: Vec<UserData>,
-    tags: Vec<TagData>,
+    pub themes: Vec<String>,
+    pub users: Vec<UserData>,
+    pub tags: Vec<TagData>,
+    pub sources: Vec<SourceData>,
+}
+
+#[derive(serde::Serialize)]
+pub struct SourceData {
+    pub id: i32,
+    pub name: String,
 }
 
 type ThemeEnumRow = (i32, String);
 type UserInfoRow = (i32, String, i32, bool, Option<String>, Option<String>);
 type TagRow = (i32, Option<String>, Option<String>, Option<String>);
+type SourceRow = (i32, String);
 
 pub fn load_app_context() -> AppContextDbData {
-    use schema::{ ThemeEnum, User, Image, Tag, TagTypeEnum };
-    let conn = &mut establish_connection();
+    use schema::{ ThemeEnum, User, Image, Tag, TagTypeEnum, Source };
+    let conn = &mut establish_connection(true);
 
     let theme_rows = ThemeEnum::table.load::<ThemeEnumRow>(conn).unwrap();
     let user_rows = User::table.left_join(Image::table)
@@ -76,6 +87,7 @@ pub fn load_app_context() -> AppContextDbData {
         ))
         .load::<TagRow>(conn)
         .unwrap();
+    let source_rows = Source::table.load::<SourceRow>(conn).unwrap();
 
     let themes: Vec<String> = theme_rows
         .into_iter()
@@ -101,8 +113,15 @@ pub fn load_app_context() -> AppContextDbData {
             tag_type: row.3.unwrap(),
         })
         .collect();
+    let sources: Vec<SourceData> = source_rows
+        .into_iter()
+        .map(|row| SourceData {
+            id: row.0,
+            name: row.1,
+        })
+        .collect();
 
-    AppContextDbData { themes, users, tags }
+    AppContextDbData { themes, users, tags, sources }
 }
 
 pub fn add_user(
@@ -112,7 +131,7 @@ pub fn add_user(
     avatar_name: String,
     prefill_deck: bool
 ) -> Result<UserData, Box<dyn Error>> {
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
     use schema::{ User, Deck, Image, Card, Card_Deck };
 
     let mut avatar_id = 1;
@@ -194,7 +213,7 @@ type DeckRow = (i32, String, i32, i32, i32);
 
 pub fn load_user_decks(user_id: i32) -> UserDecksData {
     use schema::Deck;
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
 
     let user_decks = Deck::table.filter(Deck::user.eq(user_id))
         .load::<DeckRow>(conn)
@@ -221,7 +240,7 @@ pub fn update_deck(
     mastered: i32
 ) -> Result<DeckData, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
 
     diesel
         ::update(Deck::table.filter(Deck::id.eq(deck_id)))
@@ -246,7 +265,7 @@ pub fn update_deck(
 
 pub fn delete_deck(deck_id: i32) -> Result<i32, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
 
     diesel::delete(Deck::table.filter(Deck::id.eq(deck_id))).execute(conn)?;
 
@@ -255,7 +274,7 @@ pub fn delete_deck(deck_id: i32) -> Result<i32, Box<dyn Error>> {
 
 pub fn add_deck(name: String, user: i32) -> Result<DeckData, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
 
     diesel
         ::insert_into(Deck::table)
@@ -306,7 +325,7 @@ pub struct DeckCardsMetadata {
 
 pub fn load_deck_metadata(deck_id: i32) -> DeckCardsMetadata {
     use schema::{ Deck, Card_Deck, Card, Card_Tag, Source, DifficultyEnum };
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
 
     let cards_tags = Deck::table.filter(Deck::id.eq(deck_id))
         .inner_join(Card_Deck::table)
@@ -407,7 +426,7 @@ pub fn load_card(
     card_back_id: i32
 ) -> CardContentData {
     use schema::{ CardFront, CardBack, Solution };
-    let conn = &mut establish_connection();
+    let conn = &mut establish_connection(true);
 
     let (prompt, title) = CardFront::table.filter(
         CardFront::id.eq(card_front_id)
@@ -432,4 +451,77 @@ pub fn load_card(
         .collect();
 
     CardContentData { card_id, title, prompt, notes, solutions }
+}
+
+type CardRow = (i32, i32, i32, bool, Option<i32>, bool, i32);
+
+pub fn add_card(
+    title: String,
+    source_id: Option<i32>,
+    source_name: Option<String>,
+    difficulty: String,
+    deck_id: i32
+) -> Result<CardMetadata, Box<dyn Error>> {
+    use schema::{ Card, DifficultyEnum, CardFront, CardBack, Deck, Card_Deck };
+    let conn = &mut establish_connection(false);
+
+    let new_card_id: i32 =
+        Card::table.select(Card::id)
+            .order_by(Card::id.desc())
+            .limit(1)
+            .load::<i32>(conn)?[0] + 1;
+    let card_front_id: i32 =
+        CardFront::table.select(CardFront::id)
+            .order_by(CardFront::id.desc())
+            .limit(1)
+            .load::<i32>(conn)?[0] + 1;
+    let card_back_id: i32 =
+        CardBack::table.select(CardBack::id)
+            .order_by(CardBack::id.desc())
+            .limit(1)
+            .load::<i32>(conn)?[0] + 1;
+    let difficulty_id: i32 = DifficultyEnum::table.filter(
+        DifficultyEnum::name.eq(&difficulty)
+    )
+        .select(DifficultyEnum::enum_val)
+        .first(conn)?;
+
+    insert_into(CardFront::table)
+        .values((
+            CardFront::title.eq(title),
+            CardFront::card.eq(new_card_id),
+            CardFront::prompt.eq(""),
+        ))
+        .execute(conn)?;
+    insert_into(CardBack::table)
+        .values((CardBack::card.eq(new_card_id), CardBack::notes.eq("")))
+        .execute(conn)?;
+    insert_into(Card::table)
+        .values((
+            Card::front.eq(card_front_id),
+            Card::back.eq(card_back_id),
+            Card::source.eq(source_id),
+            Card::difficulty.eq(difficulty_id),
+        ))
+        .execute(conn)?;
+    insert_into(Card_Deck::table)
+        .values((Card_Deck::card.eq(new_card_id), Card_Deck::deck.eq(deck_id)))
+        .execute(conn)?;
+    update(Deck::table.filter(Deck::id.eq(deck_id)))
+        .set(Deck::size.eq(Deck::size + 1))
+        .execute(conn)?;
+
+    let inserted_card_row = Card::table.filter(
+        Card::id.eq(new_card_id)
+    ).first::<CardRow>(conn)?;
+    Ok(CardMetadata {
+        id: inserted_card_row.0,
+        front: inserted_card_row.1,
+        back: inserted_card_row.2,
+        mastered: inserted_card_row.3,
+        source: source_name,
+        shipped: inserted_card_row.5,
+        difficulty,
+        tags: vec![],
+    })
 }

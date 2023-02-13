@@ -84,8 +84,14 @@ export interface AppLevelContext {
     currentUser: number | null
     currentTheme: Theme
     pageHistory: HistoryEntry[]
+    sources: Map<number, Source>
     tags: Map<number, Tag>
     updater: React.Dispatch<React.SetStateAction<AppLevelContext>> | null
+}
+
+export interface Source {
+    id: number
+    name: string
 }
 
 export interface TagFetchData {
@@ -108,6 +114,7 @@ export interface AppContextFetchData {
     tags: TagFetchData[]
     themes: string[]
     users: UserFetchData[]
+    sources: Source[]
 }
 
 ///////////////////////////
@@ -198,12 +205,12 @@ export interface AddTagsModalProps {
 }
 
 export interface AddCardModalProps {
-    unrender: (add: boolean, newCardInfo?: NewCardInfo) => void
+    unrender: () => void
 }
 
 export interface NewCardInfo {
     title: string
-    source: string
+    source: string | null
     difficulty: Difficulty
 }
 

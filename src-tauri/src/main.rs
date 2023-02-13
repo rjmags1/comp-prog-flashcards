@@ -72,7 +72,6 @@ fn add_deck(name: String, user: i32) -> Result<database::DeckData, String> {
 
 #[tauri::command]
 fn load_card_metadata(deck_id: i32) -> database::DeckCardsMetadata {
-    // -> Result<Vec<database::CardData>, String>
     database::load_deck_metadata(deck_id)
 }
 
@@ -83,6 +82,28 @@ fn load_card(
     card_back_id: i32
 ) -> database::CardContentData {
     database::load_card(card_id, card_front_id, card_back_id)
+}
+
+#[tauri::command]
+fn add_card(
+    title: String,
+    source_id: Option<i32>,
+    source_name: Option<String>,
+    difficulty: String,
+    deck_id: i32
+) -> Result<database::CardMetadata, String> {
+    let add_result = database::add_card(
+        title,
+        source_id,
+        source_name,
+        difficulty,
+        deck_id
+    );
+
+    match add_result {
+        Ok(card_metadata) => Ok(card_metadata),
+        Err(e) => Err(format!("Card add failure: {}", e)),
+    }
 }
 
 fn main() {
@@ -97,7 +118,8 @@ fn main() {
                 delete_deck,
                 add_deck,
                 load_card_metadata,
-                load_card
+                load_card,
+                add_card
             ]
         )
         .run(tauri::generate_context!())

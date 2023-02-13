@@ -1,9 +1,7 @@
 import {
-    Card,
     CardMetadata,
     CardsPageProps,
     DeckLevelContext,
-    Difficulty,
     AppLevelContext,
     Page,
     DeckCardsMetadata,
@@ -29,51 +27,51 @@ function CardsPage({ deckId }: CardsPageProps) {
         updater: null,
     })
 
-    const deckLoader = async () => {
-        try {
-            const { card_metadata, deck_name }: DeckCardsMetadata =
-                await invoke("load_card_metadata", {
-                    deckId,
-                })
-            const cards: Map<number, CardMetadata> = new Map()
-            card_metadata.forEach(
-                ({
-                    id,
-                    front,
-                    back,
-                    mastered,
-                    source,
-                    shipped,
-                    difficulty,
-                    tags,
-                }) => {
-                    cards.set(id, {
+    useEffect(() => {
+        const deckLoader = async () => {
+            try {
+                const { card_metadata, deck_name }: DeckCardsMetadata =
+                    await invoke("load_card_metadata", {
+                        deckId,
+                    })
+                const cards: Map<number, CardMetadata> = new Map()
+                card_metadata.forEach(
+                    ({
                         id,
                         front,
                         back,
                         mastered,
                         source,
                         shipped,
-                        difficulty: DifficultyLookup.get(difficulty)!,
-                        tags: new Set(tags),
-                    })
-                }
-            )
-            const filteredCards = new Map(cards)
-            setDeckContext((initialDeckContext) => ({
-                ...initialDeckContext,
-                cards,
-                filteredCards,
-                currentCardId: card_metadata[0].id,
-                updater: setDeckContext,
-            }))
-            setDeckName(deck_name)
-        } catch (e) {
-            console.log(e)
+                        difficulty,
+                        tags,
+                    }) => {
+                        cards.set(id, {
+                            id,
+                            front,
+                            back,
+                            mastered,
+                            source,
+                            shipped,
+                            difficulty: DifficultyLookup.get(difficulty)!,
+                            tags: new Set(tags),
+                        })
+                    }
+                )
+                const filteredCards = new Map(cards)
+                setDeckContext((initialDeckContext) => ({
+                    ...initialDeckContext,
+                    cards,
+                    filteredCards,
+                    currentCardId: card_metadata[0].id,
+                    updater: setDeckContext,
+                }))
+                setDeckName(deck_name)
+            } catch (e) {
+                console.error(e)
+            }
         }
-    }
 
-    useEffect(() => {
         if (deckContext.updater === null) {
             deckLoader()
         }

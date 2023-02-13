@@ -67,7 +67,7 @@ CREATE TABLE Card (
     difficulty INTEGER NOT NULL,
     FOREIGN KEY(front) REFERENCES CardFront(id),
     FOREIGN KEY(back) REFERENCES CardBack(id),
-    FOREIGN KEY(difficulty) REFERENCES Difficulty(enum_val)
+    FOREIGN KEY(difficulty) REFERENCES DifficultyEnum(enum_val)
 );
 
 CREATE TABLE Card_Deck (
