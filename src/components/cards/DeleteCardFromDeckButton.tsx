@@ -15,14 +15,23 @@ function DeleteCardFromDeckButton() {
     const doDelete = () => {
         // invoke tauri command logic
 
-        const { cards, filteredCards, currentCardId, updater } = deckContext
+        const {
+            cards,
+            filteredCards,
+            currentCardId: currentCardId,
+            updater,
+        } = deckContext
         const newCards = new Map(cards),
             newFilteredCards = new Map(filteredCards)
-        newCards.delete(currentCardId)
-        newFilteredCards.delete(currentCardId)
+        newCards.delete(currentCardId as number)
+        newFilteredCards.delete(currentCardId as number)
         updater!({
             ...deckContext,
-            currentCardId: nextCardId(currentCardId, filteredCards, 1),
+            currentCardId: nextCardId(
+                currentCardId as number,
+                filteredCards,
+                1
+            ),
             cards: newCards,
             filteredCards: newFilteredCards,
         })

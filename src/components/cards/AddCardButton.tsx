@@ -30,7 +30,7 @@ function AddCardButton() {
                                 front: cards.size + 1, // from tauri return
                                 back: cards.size + 1, // from tauri return
                                 mastered: false,
-                                source: 1, // from tauri return
+                                source: "Leetcode", // from tauri return
                                 shipped: false,
                                 difficulty: Difficulty.Easy, // from tauri return
                                 tags: new Set(),

@@ -15,7 +15,11 @@ function ScrollButton({ direction }: ScrollButtonProps) {
         const step = direction === ScrollDirection.Prev ? -1 : 1
         updater!({
             ...deckContext,
-            currentCardId: nextCardId(currentCardId, filteredCards, step),
+            currentCardId: nextCardId(
+                currentCardId as number,
+                filteredCards,
+                step
+            ),
         })
     }
 

@@ -1,9 +1,11 @@
+use std::collections::{ HashMap, HashSet };
 use std::error::Error;
 
 use diesel::connection::SimpleConnection;
 use diesel::sqlite::SqliteConnection;
 use diesel::{ prelude::*, insert_into };
 use crate::schema;
+use crate::schema::CardBack::card;
 
 const DATABASE_URL: &str = "sqlite://cpf.db";
 
@@ -270,4 +272,164 @@ pub fn add_deck(name: String, user: i32) -> Result<DeckData, Box<dyn Error>> {
         size: inserted.3,
         mastered: inserted.4,
     })
+}
+
+#[derive(serde::Serialize, Debug)]
+pub struct CardMetadata {
+    pub id: i32,
+    pub front: i32,
+    pub back: i32,
+    pub mastered: bool,
+    pub source: Option<String>,
+    pub shipped: bool,
+    pub difficulty: String,
+    pub tags: Vec<i32>,
+}
+
+type PartialCardMetadataRow = (
+    i32,
+    i32,
+    i32,
+    bool,
+    Option<i32>,
+    Option<String>,
+    bool,
+    Option<i32>,
+);
+
+#[derive(serde::Serialize, Debug)]
+pub struct DeckCardsMetadata {
+    pub deck_id: i32,
+    pub deck_name: String,
+    pub card_metadata: Vec<CardMetadata>,
+}
+
+pub fn load_deck_metadata(deck_id: i32) -> DeckCardsMetadata {
+    use schema::{ Deck, Card_Deck, Card, Card_Tag, Source, DifficultyEnum };
+    let conn = &mut establish_connection();
+
+    let cards_tags = Deck::table.filter(Deck::id.eq(deck_id))
+        .inner_join(Card_Deck::table)
+        .inner_join(Card::table.on(Card::id.eq(Card_Deck::card)))
+        .left_join(Card_Tag::table.on(Card_Tag::card.eq(Card::id)))
+        .left_join(
+            DifficultyEnum::table.on(
+                DifficultyEnum::enum_val.eq(Card::difficulty)
+            )
+        )
+        .select((
+            Card::id,
+            Card::front,
+            Card::back,
+            Card::mastered,
+            Card::source.nullable(),
+            DifficultyEnum::name.nullable(),
+            Card::shipped,
+            Card_Tag::tag.nullable(),
+        ))
+        .load::<PartialCardMetadataRow>(conn)
+        .unwrap();
+    let sources_vec = Source::table.load::<(i32, String)>(conn).unwrap();
+    let mut sources: HashMap<i32, String> = HashMap::new();
+    sources_vec.into_iter().for_each(|(id, name)| {
+        sources.insert(id, name);
+    });
+
+    let mut card_metadata: Vec<CardMetadata> = vec![];
+    let mut num_cards = 0;
+    let mut prev_id: i32 = -1;
+    for (
+        id,
+        front,
+        back,
+        mastered,
+        source_id,
+        difficulty,
+        shipped,
+        tag,
+    ) in cards_tags.iter() {
+        if *id != prev_id {
+            prev_id = *id;
+            num_cards += 1;
+            let mut new_card = CardMetadata {
+                id: *id,
+                front: *front,
+                back: *back,
+                mastered: *mastered,
+                source: None,
+                difficulty: difficulty.as_ref().unwrap().to_string(),
+                shipped: *shipped,
+                tags: vec![],
+            };
+            if let Some(source_id_) = source_id {
+                new_card.source = Some(
+                    sources.get(source_id_).unwrap().to_string()
+                );
+            }
+            card_metadata.push(new_card);
+        }
+        if let Some(tag_id) = tag {
+            card_metadata[num_cards - 1].tags.push(*tag_id);
+        }
+    }
+
+    let deck_name = Deck::table.filter(Deck::id.eq(deck_id))
+        .select(Deck::name)
+        .first::<String>(conn)
+        .unwrap();
+
+    DeckCardsMetadata {
+        deck_id,
+        deck_name,
+        card_metadata,
+    }
+}
+
+#[derive(serde::Serialize, Debug)]
+pub struct CardContentData {
+    card_id: i32,
+    title: String,
+    prompt: String,
+    notes: String,
+    solutions: Vec<SolutionData>,
+}
+
+#[derive(serde::Serialize, Debug)]
+pub struct SolutionData {
+    id: i32,
+    content: String,
+    name: String,
+}
+
+pub fn load_card(
+    card_id: i32,
+    card_front_id: i32,
+    card_back_id: i32
+) -> CardContentData {
+    use schema::{ CardFront, CardBack, Solution };
+    let conn = &mut establish_connection();
+
+    let (prompt, title) = CardFront::table.filter(
+        CardFront::id.eq(card_front_id)
+    )
+        .select((CardFront::prompt, CardFront::title))
+        .first::<(String, String)>(conn)
+        .unwrap();
+
+    let notes = CardBack::table.filter(CardBack::id.eq(card_back_id))
+        .select(CardBack::notes)
+        .first::<String>(conn)
+        .unwrap();
+
+    let solutions: Vec<SolutionData> = Solution::table.filter(
+        Solution::cardback.eq(card_back_id)
+    )
+        .select((Solution::id, Solution::name, Solution::content))
+        .load::<(i32, String, String)>(conn)
+        .unwrap()
+        .into_iter()
+        .map(|(id, name, content)| SolutionData { id, name, content })
+        .collect();
+
+    CardContentData { card_id, title, prompt, notes, solutions }
 }

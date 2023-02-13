@@ -23,20 +23,18 @@ function CardBack({ cardData }: CardBackProps) {
 
     // fill tabs using cardData
     useEffect(() => {
-        if (cardData.notes.length > 0) {
-            setTabs([
-                {
-                    title: "Notes",
-                    content: cardData.notes,
-                    index: 0,
-                },
-                ...cardData.solutions.map(({ name, content }, i) => ({
-                    title: name,
-                    content,
-                    index: i + 1,
-                })),
-            ])
-        }
+        setTabs([
+            {
+                title: "Notes",
+                content: cardData.notes,
+                index: 0,
+            },
+            ...cardData.solutions.map(({ name, content }, i) => ({
+                title: name,
+                content,
+                index: i + 1,
+            })),
+        ])
     }, [cardData])
 
     // UI tab change --> setTabIdx --> below effect trigger

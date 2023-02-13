@@ -70,6 +70,21 @@ fn add_deck(name: String, user: i32) -> Result<database::DeckData, String> {
     }
 }
 
+#[tauri::command]
+fn load_card_metadata(deck_id: i32) -> database::DeckCardsMetadata {
+    // -> Result<Vec<database::CardData>, String>
+    database::load_deck_metadata(deck_id)
+}
+
+#[tauri::command]
+fn load_card(
+    card_id: i32,
+    card_front_id: i32,
+    card_back_id: i32
+) -> database::CardContentData {
+    database::load_card(card_id, card_front_id, card_back_id)
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -80,7 +95,9 @@ fn main() {
                 load_user_decks,
                 update_deck,
                 delete_deck,
-                add_deck
+                add_deck,
+                load_card_metadata,
+                load_card
             ]
         )
         .run(tauri::generate_context!())

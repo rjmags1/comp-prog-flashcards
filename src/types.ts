@@ -15,6 +15,11 @@ export enum Difficulty {
     Medium = "Medium",
     Hard = "Hard",
 }
+export const DifficultyLookup: ReadonlyMap<string, Difficulty> = new Map([
+    ["Easy", Difficulty.Easy],
+    ["Medium", Difficulty.Medium],
+    ["Hard", Difficulty.Hard],
+])
 
 export enum TagType {
     Paradigm = "Paradigm",
@@ -211,7 +216,7 @@ export interface DeckLevelContext {
     currentDeck: number
     cards: Map<number, CardMetadata>
     filteredCards: Map<number, CardMetadata>
-    currentCardId: number
+    currentCardId: number | null
     filterTags: Set<number>
     updater: React.Dispatch<React.SetStateAction<DeckLevelContext>> | null
 }
@@ -247,8 +252,17 @@ export interface Card {
 }
 
 export interface Solution {
+    id: number
     name: string
     content: string
+}
+
+export interface CardContent {
+    card_id: number
+    title: string
+    prompt: string
+    notes: string
+    solutions: Solution[]
 }
 
 export interface CardMetadata {
@@ -256,10 +270,27 @@ export interface CardMetadata {
     front: number
     back: number
     mastered: boolean
-    source: number
+    source: string | null
     shipped: boolean
     difficulty: Difficulty
     tags: Set<number>
+}
+
+export interface CardFetchMetadata {
+    id: number
+    front: number
+    back: number
+    mastered: boolean
+    shipped: boolean
+    source: string | null
+    difficulty: string
+    tags: number[]
+}
+
+export interface DeckCardsMetadata {
+    deck_id: number
+    deck_name: string
+    card_metadata: CardFetchMetadata[]
 }
 
 export interface TagFilterProps {

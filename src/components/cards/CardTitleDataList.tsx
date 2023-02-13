@@ -42,20 +42,20 @@ function CardTitleDatalist() {
         setAllTitles(tempTitlesMap)
     })
 
-    const options: Options<CardTitleOption> =
-        allTitles.size === 0
-            ? []
-            : Array.from(filteredCards.keys())
-                  .filter(
-                      (id) =>
-                          filteredCards.has(id) &&
-                          allTitles.get(id)!.indexOf(searchText) > -1
-                  )
-                  .map((id) => ({
-                      label: allTitles.get(id)!,
-                      value: allTitles.get(id)!,
-                      id: id,
-                  }))
+    const options: Options<CardTitleOption> = []
+    //allTitles.size === 0
+    //? []
+    //: Array.from(filteredCards.keys())
+    //.filter(
+    //(id) =>
+    //filteredCards.has(id) &&
+    //allTitles.get(id)!.indexOf(searchText) > -1
+    //)
+    //.map((id) => ({
+    //label: allTitles.get(id)!,
+    //value: allTitles.get(id)!,
+    //id: id,
+    //}))
 
     return (
         <Select
