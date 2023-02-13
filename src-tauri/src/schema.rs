@@ -82,7 +82,7 @@ diesel::table! {
 diesel::table! {
     Source (id) {
         id -> Integer,
-        name -> Nullable<Text>,
+        name -> Text,
     }
 }
 
