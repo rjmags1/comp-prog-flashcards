@@ -126,6 +126,16 @@ fn add_card_to_deck(card_id: i32, deck_ids: Vec<i32>) -> Result<(), String> {
     }
 }
 
+#[tauri::command]
+fn delete_card_from_deck(card_id: i32, deck_id: i32) -> Result<i32, String> {
+    let delete_result = database::delete_card_from_deck(card_id, deck_id);
+
+    match delete_result {
+        Ok(deleted_id) => Ok(deleted_id),
+        Err(e) => Err(format!("Card delete failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -142,7 +152,8 @@ fn main() {
                 add_card,
                 load_card_titles,
                 add_card_to_deck,
-                load_card_decks
+                load_card_decks,
+                delete_card_from_deck
             ]
         )
         .run(tauri::generate_context!())

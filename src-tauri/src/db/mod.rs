@@ -2,17 +2,18 @@ use std::collections::HashMap;
 use std::error::Error;
 
 use diesel::connection::SimpleConnection;
+use diesel::dsl::count_star;
 use diesel::sqlite::SqliteConnection;
-use diesel::{ prelude::*, insert_into, update };
+use diesel::{ prelude::*, insert_into, update, delete };
 use crate::schema;
 
 const DATABASE_URL: &str = "sqlite://cpf.db";
 
-pub fn establish_connection(enable_fk: bool) -> SqliteConnection {
+pub fn establish_connection(disable_fk: bool) -> SqliteConnection {
     let mut conn = SqliteConnection::establish(DATABASE_URL).unwrap_or_else(|_|
         panic!("Error connecting to database")
     );
-    if enable_fk {
+    if !disable_fk {
         conn.batch_execute("PRAGMA foreign_keys = ON").expect(
             "fk pragma failed"
         );
@@ -63,7 +64,7 @@ type SourceRow = (i32, String);
 
 pub fn load_app_context() -> AppContextDbData {
     use schema::{ ThemeEnum, User, Image, Tag, TagTypeEnum, Source };
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     let theme_rows = ThemeEnum::table.load::<ThemeEnumRow>(conn).unwrap();
     let user_rows = User::table.left_join(Image::table)
@@ -131,7 +132,7 @@ pub fn add_user(
     avatar_name: String,
     prefill_deck: bool
 ) -> Result<UserData, Box<dyn Error>> {
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
     use schema::{ User, Deck, Image, Card, Card_Deck };
 
     conn.transaction(|conn| {
@@ -215,7 +216,7 @@ type DeckRow = (i32, String, i32, i32, i32);
 
 pub fn load_user_decks(user_id: i32) -> UserDecksData {
     use schema::Deck;
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     let user_decks = Deck::table.filter(Deck::user.eq(user_id))
         .load::<DeckRow>(conn)
@@ -242,7 +243,7 @@ pub fn update_deck(
     mastered: i32
 ) -> Result<DeckData, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     diesel
         ::update(Deck::table.filter(Deck::id.eq(deck_id)))
@@ -267,16 +268,16 @@ pub fn update_deck(
 
 pub fn delete_deck(deck_id: i32) -> Result<i32, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
-    diesel::delete(Deck::table.filter(Deck::id.eq(deck_id))).execute(conn)?;
+    delete(Deck::table.filter(Deck::id.eq(deck_id))).execute(conn)?;
 
     Ok(deck_id)
 }
 
 pub fn add_deck(name: String, user: i32) -> Result<DeckData, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     diesel
         ::insert_into(Deck::table)
@@ -327,7 +328,7 @@ pub struct DeckCardsMetadata {
 
 pub fn load_deck_metadata(deck_id: i32) -> DeckCardsMetadata {
     use schema::{ Deck, Card_Deck, Card, Card_Tag, Source, DifficultyEnum };
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     let cards_tags = Deck::table.filter(Deck::id.eq(deck_id))
         .inner_join(Card_Deck::table)
@@ -428,7 +429,7 @@ pub fn load_card(
     card_back_id: i32
 ) -> CardContentData {
     use schema::{ CardFront, CardBack, Solution };
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     let (prompt, title) = CardFront::table.filter(
         CardFront::id.eq(card_front_id)
@@ -465,7 +466,7 @@ pub fn add_card(
     deck_id: i32
 ) -> Result<CardMetadata, Box<dyn Error>> {
     use schema::{ Card, DifficultyEnum, CardFront, CardBack, Deck, Card_Deck };
-    let conn = &mut establish_connection(false);
+    let conn = &mut establish_connection(true);
 
     conn.transaction(|conn| {
         let new_card_id: i32 =
@@ -536,7 +537,7 @@ pub fn add_card(
 
 pub fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
     use schema::{ CardFront, Card_Deck };
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     Card_Deck::table.filter(Card_Deck::deck.eq(deck_id))
         .inner_join(CardFront::table.on(CardFront::card.eq(Card_Deck::card)))
@@ -550,7 +551,7 @@ pub fn add_card_to_deck(
     deck_ids: Vec<i32>
 ) -> Result<(), Box<dyn Error>> {
     use schema::Card_Deck;
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     let insert_rows: Vec<_> = deck_ids
         .into_iter()
@@ -566,10 +567,39 @@ pub fn add_card_to_deck(
 
 pub fn load_card_decks(card_id: i32) -> Vec<i32> {
     use schema::Card_Deck;
-    let conn = &mut establish_connection(true);
+    let conn = &mut establish_connection(false);
 
     Card_Deck::table.filter(Card_Deck::card.eq(card_id))
         .select(Card_Deck::deck)
         .load::<i32>(conn)
         .unwrap()
+}
+
+pub fn delete_card_from_deck(
+    card_id: i32,
+    deck_id: i32
+) -> Result<i32, Box<dyn Error>> {
+    use schema::{ Card_Deck, Card };
+    let conn = &mut establish_connection(false);
+
+    conn.transaction(|conn| {
+        let num_decks: i32 = Card_Deck::table.filter(
+            Card_Deck::card.eq(card_id)
+        )
+            .select(Card_Deck::deck)
+            .load::<i32>(conn)?
+            .len() as i32;
+
+        if num_decks == 1 {
+            delete(Card::table.filter(Card::id.eq(card_id))).execute(conn)?;
+        } else {
+            delete(
+                Card_Deck::table.filter(Card_Deck::card.eq(card_id)).filter(
+                    Card_Deck::deck.eq(deck_id)
+                )
+            ).execute(conn)?;
+        }
+
+        Ok(card_id)
+    })
 }

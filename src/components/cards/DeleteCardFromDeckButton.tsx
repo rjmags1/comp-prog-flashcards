@@ -3,6 +3,7 @@ import { useContext, useState } from "react"
 import { DeckLevelContext } from "../../types"
 import { nextCardId } from "../../helpers"
 import PopupMessage from "../general/PopupMessage"
+import { invoke } from "@tauri-apps/api"
 
 // TODO:
 //    - delete from deck tauri command logic on click
@@ -10,31 +11,35 @@ import PopupMessage from "../general/PopupMessage"
 function DeleteCardFromDeckButton() {
     const deckContext = useContext(DeckContext) as DeckLevelContext
     const [renderPopup, setRenderPopup] = useState(false)
-    const [deleted, setDeleted] = useState(false)
 
-    const doDelete = () => {
-        // invoke tauri command logic
-
-        const {
-            cards,
-            filteredCards,
-            currentCardId: currentCardId,
-            updater,
-        } = deckContext
-        const newCards = new Map(cards),
-            newFilteredCards = new Map(filteredCards)
-        newCards.delete(currentCardId as number)
-        newFilteredCards.delete(currentCardId as number)
-        updater!({
-            ...deckContext,
-            currentCardId: nextCardId(
-                currentCardId as number,
+    const doDelete = async () => {
+        try {
+            const {
+                cards,
                 filteredCards,
-                1
-            ),
-            cards: newCards,
-            filteredCards: newFilteredCards,
-        })
+                currentCardId: cardId,
+                currentDeck: deckId,
+                updater,
+            } = deckContext
+            const deletedId: number = await invoke("delete_card_from_deck", {
+                cardId,
+                deckId,
+            })
+
+            const newCards = new Map(cards),
+                newFilteredCards = new Map(filteredCards)
+            newCards.delete(deletedId)
+            newFilteredCards.delete(deletedId)
+            updater!({
+                ...deckContext,
+                currentCardId: nextCardId(deletedId, filteredCards, 1),
+                cards: newCards,
+                filteredCards: newFilteredCards,
+            })
+            setRenderPopup(false)
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     return (
@@ -42,11 +47,8 @@ function DeleteCardFromDeckButton() {
             {renderPopup && (
                 <PopupMessage
                     whiteText
-                    message="Remove this card from the deck?"
-                    unrender={(d?: boolean) => {
-                        setRenderPopup(false)
-                        setDeleted(d as boolean)
-                    }}
+                    message="Remove this card from the current deck?"
+                    unrender={(d?: boolean) => d && doDelete()}
                 />
             )}
             <button
