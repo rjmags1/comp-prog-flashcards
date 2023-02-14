@@ -8,11 +8,11 @@ use crate::schema;
 
 const DATABASE_URL: &str = "sqlite://cpf.db";
 
-pub fn establish_connection(fk: bool) -> SqliteConnection {
+pub fn establish_connection(enable_fk: bool) -> SqliteConnection {
     let mut conn = SqliteConnection::establish(DATABASE_URL).unwrap_or_else(|_|
         panic!("Error connecting to database")
     );
-    if fk {
+    if enable_fk {
         conn.batch_execute("PRAGMA foreign_keys = ON").expect(
             "fk pragma failed"
         );
@@ -134,64 +134,66 @@ pub fn add_user(
     let conn = &mut establish_connection(true);
     use schema::{ User, Deck, Image, Card, Card_Deck };
 
-    let mut avatar_id = 1;
-    if !default_avatar {
-        insert_into(Image::table)
-            .values((
-                Image::name.eq(&avatar_name),
-                Image::path.eq(&avatar_path),
-            ))
-            .execute(conn)?;
-        avatar_id = Image::table.select(Image::id)
-            .order(Image::id.desc())
-            .limit(1)
-            .load::<i32>(conn)
-            .unwrap()[0];
-    }
-
-    insert_into(User::table)
-        .values((User::username.eq(&username), User::avatar.eq(avatar_id)))
-        .execute(conn)?;
-    let user_id = User::table.select(User::id)
-        .order(User::id.desc())
-        .limit(1)
-        .load(conn)
-        .unwrap()[0];
-
-    if prefill_deck {
-        insert_into(Deck::table)
-            .values((Deck::name.eq("Deck 1"), Deck::user.eq(user_id)))
-            .execute(conn)?;
-        let deck_id = Deck::table.select(Deck::id)
-            .order(Deck::id.desc())
-            .limit(1)
-            .load::<i32>(conn)
-            .unwrap()[0];
-
-        let shipped_card_ids = Card::table.filter(Card::shipped.eq(true))
-            .select(Card::id)
-            .load::<i32>(conn)
-            .unwrap();
-        let mut card_deck_rows = vec![(
-            Card_Deck::card.eq(shipped_card_ids[0]),
-            Card_Deck::deck.eq(deck_id),
-        )];
-        for i in 1..shipped_card_ids.len() {
-            card_deck_rows.push((
-                Card_Deck::card.eq(shipped_card_ids[i]),
-                Card_Deck::deck.eq(deck_id),
-            ));
+    conn.transaction(|conn| {
+        let mut avatar_id = 1;
+        if !default_avatar {
+            insert_into(Image::table)
+                .values((
+                    Image::name.eq(&avatar_name),
+                    Image::path.eq(&avatar_path),
+                ))
+                .execute(conn)?;
+            avatar_id = Image::table.select(Image::id)
+                .order(Image::id.desc())
+                .limit(1)
+                .load::<i32>(conn)
+                .unwrap()[0];
         }
-        insert_into(Card_Deck::table).values(card_deck_rows).execute(conn)?;
-    }
 
-    Ok(UserData {
-        id: user_id,
-        username,
-        avatar_path,
-        theme: String::from("Normal"),
-        tagmask: 0,
-        hidediffs: false,
+        insert_into(User::table)
+            .values((User::username.eq(&username), User::avatar.eq(avatar_id)))
+            .execute(conn)?;
+        let user_id = User::table.select(User::id)
+            .order(User::id.desc())
+            .limit(1)
+            .load(conn)
+            .unwrap()[0];
+
+        if prefill_deck {
+            insert_into(Deck::table)
+                .values((Deck::name.eq("Deck 1"), Deck::user.eq(user_id)))
+                .execute(conn)?;
+            let deck_id = Deck::table.select(Deck::id)
+                .order(Deck::id.desc())
+                .limit(1)
+                .load::<i32>(conn)
+                .unwrap()[0];
+
+            let shipped_card_ids = Card::table.filter(Card::shipped.eq(true))
+                .select(Card::id)
+                .load::<i32>(conn)
+                .unwrap();
+            let mut card_deck_rows = vec![(
+                Card_Deck::card.eq(shipped_card_ids[0]),
+                Card_Deck::deck.eq(deck_id),
+            )];
+            for i in 1..shipped_card_ids.len() {
+                card_deck_rows.push((
+                    Card_Deck::card.eq(shipped_card_ids[i]),
+                    Card_Deck::deck.eq(deck_id),
+                ));
+            }
+            insert_into(Card_Deck::table).values(card_deck_rows).execute(conn)?;
+        }
+
+        Ok(UserData {
+            id: user_id,
+            username,
+            avatar_path,
+            theme: String::from("Normal"),
+            tagmask: 0,
+            hidediffs: false,
+        })
     })
 }
 
@@ -465,64 +467,70 @@ pub fn add_card(
     use schema::{ Card, DifficultyEnum, CardFront, CardBack, Deck, Card_Deck };
     let conn = &mut establish_connection(false);
 
-    let new_card_id: i32 =
-        Card::table.select(Card::id)
-            .order_by(Card::id.desc())
-            .limit(1)
-            .load::<i32>(conn)?[0] + 1;
-    let card_front_id: i32 =
-        CardFront::table.select(CardFront::id)
-            .order_by(CardFront::id.desc())
-            .limit(1)
-            .load::<i32>(conn)?[0] + 1;
-    let card_back_id: i32 =
-        CardBack::table.select(CardBack::id)
-            .order_by(CardBack::id.desc())
-            .limit(1)
-            .load::<i32>(conn)?[0] + 1;
-    let difficulty_id: i32 = DifficultyEnum::table.filter(
-        DifficultyEnum::name.eq(&difficulty)
-    )
-        .select(DifficultyEnum::enum_val)
-        .first(conn)?;
+    conn.transaction(|conn| {
+        let new_card_id: i32 =
+            Card::table.select(Card::id)
+                .order_by(Card::id.desc())
+                .limit(1)
+                .load::<i32>(conn)?[0] + 1;
+        let card_front_id: i32 =
+            CardFront::table.select(CardFront::id)
+                .order_by(CardFront::id.desc())
+                .limit(1)
+                .load::<i32>(conn)?[0] + 1;
+        let card_back_id: i32 =
+            CardBack::table.select(CardBack::id)
+                .order_by(CardBack::id.desc())
+                .limit(1)
+                .load::<i32>(conn)?[0] + 1;
+        let difficulty_id: i32 = DifficultyEnum::table.filter(
+            DifficultyEnum::name.eq(&difficulty)
+        )
+            .select(DifficultyEnum::enum_val)
+            .first(conn)?;
 
-    insert_into(CardFront::table)
-        .values((
-            CardFront::title.eq(title),
-            CardFront::card.eq(new_card_id),
-            CardFront::prompt.eq(""),
-        ))
-        .execute(conn)?;
-    insert_into(CardBack::table)
-        .values((CardBack::card.eq(new_card_id), CardBack::notes.eq("")))
-        .execute(conn)?;
-    insert_into(Card::table)
-        .values((
-            Card::front.eq(card_front_id),
-            Card::back.eq(card_back_id),
-            Card::source.eq(source_id),
-            Card::difficulty.eq(difficulty_id),
-        ))
-        .execute(conn)?;
-    insert_into(Card_Deck::table)
-        .values((Card_Deck::card.eq(new_card_id), Card_Deck::deck.eq(deck_id)))
-        .execute(conn)?;
-    update(Deck::table.filter(Deck::id.eq(deck_id)))
-        .set(Deck::size.eq(Deck::size + 1))
-        .execute(conn)?;
+        insert_into(CardFront::table)
+            .values((
+                CardFront::title.eq(title),
+                CardFront::card.eq(new_card_id),
+                CardFront::prompt.eq(""),
+            ))
+            .execute(conn)?;
+        insert_into(CardBack::table)
+            .values((CardBack::card.eq(new_card_id), CardBack::notes.eq("")))
+            .execute(conn)?;
+        insert_into(Card::table)
+            .values((
+                Card::front.eq(card_front_id),
+                Card::back.eq(card_back_id),
+                Card::source.eq(source_id),
+                Card::difficulty.eq(difficulty_id),
+            ))
+            .execute(conn)?;
+        insert_into(Card_Deck::table)
+            .values((
+                Card_Deck::card.eq(new_card_id),
+                Card_Deck::deck.eq(deck_id),
+            ))
+            .execute(conn)?;
+        update(Deck::table.filter(Deck::id.eq(deck_id)))
+            .set(Deck::size.eq(Deck::size + 1))
+            .execute(conn)?;
 
-    let inserted_card_row = Card::table.filter(
-        Card::id.eq(new_card_id)
-    ).first::<CardRow>(conn)?;
-    Ok(CardMetadata {
-        id: inserted_card_row.0,
-        front: inserted_card_row.1,
-        back: inserted_card_row.2,
-        mastered: inserted_card_row.3,
-        source: source_name,
-        shipped: inserted_card_row.5,
-        difficulty,
-        tags: vec![],
+        let inserted_card_row = Card::table.filter(
+            Card::id.eq(new_card_id)
+        ).first::<CardRow>(conn)?;
+
+        Ok(CardMetadata {
+            id: inserted_card_row.0,
+            front: inserted_card_row.1,
+            back: inserted_card_row.2,
+            mastered: inserted_card_row.3,
+            source: source_name,
+            shipped: inserted_card_row.5,
+            difficulty,
+            tags: vec![],
+        })
     })
 }
 
