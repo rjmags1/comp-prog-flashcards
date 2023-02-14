@@ -5,38 +5,57 @@ import { AppContext } from "../../app/App"
 import {
     AddToDeckModalProps,
     AppLevelContext,
+    Deck,
     DeckLevelContext,
 } from "../../types"
 import { DeckContext } from "../../pages/CardsPage"
 import ExitButton from "../general/ExitButton"
+import { invoke } from "@tauri-apps/api"
 
-// TODO:
-//    - get all users deck ids, names using user id in app context
-//          and whether or not card is in various decks (Tauri command)
-//    - db add or remove decks via Tauri command based on user's selection
-
-type Option = {
+type DeckOption = {
     value: number
     label: string
 }
 
 function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
-    const { currentUser } = useContext(AppContext) as AppLevelContext
-    const { currentDeck } = useContext(DeckContext) as DeckLevelContext
-    const [decks, setDecks] = useState<Options<Option>>([])
-    const [selectedDecks, setSelectedDecks] = useState<Options<Option>>([])
+    const { currentUser, users } = useContext(AppContext) as AppLevelContext
+    const { currentDeck, currentCardId } = useContext(
+        DeckContext
+    ) as DeckLevelContext
+    const [decks, setDecks] = useState<Options<DeckOption>>([])
+    const [selectedDecks, setSelectedDecks] = useState<Options<DeckOption>>([])
 
     useEffect(() => {
         if (decks.length > 0) return
 
-        // tauri command invocation to get all deck ids
-
-        //setDecks(tempDeckIds.filter((d) => d.value !== currentDeck))
-        setDecks([])
+        const decksLoader = async () => {
+            const { decks }: { decks: Deck[] } = await invoke(
+                "load_user_decks",
+                {
+                    userId: users.get(currentUser!)!.id,
+                }
+            )
+            const alreadyIn = new Set(
+                (await invoke("load_card_decks", {
+                    cardId: currentCardId,
+                })) as number[]
+            )
+            setDecks(
+                decks
+                    .filter(({ id }) => !alreadyIn.has(id))
+                    .map(({ id, name }) => ({ value: id, label: name }))
+            )
+        }
+        decksLoader()
     })
 
-    const handleAdd = () => {
-        // TODO
+    const handleAdd = async () => {
+        try {
+            const deckIds = selectedDecks.map((d) => d.value)
+            await invoke("add_card_to_deck", { cardId: currentCardId, deckIds })
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     return (

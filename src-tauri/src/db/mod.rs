@@ -536,3 +536,32 @@ pub fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
         .load::<(i32, String)>(conn)
         .unwrap()
 }
+
+pub fn add_card_to_deck(
+    card_id: i32,
+    deck_ids: Vec<i32>
+) -> Result<(), Box<dyn Error>> {
+    use schema::Card_Deck;
+    let conn = &mut establish_connection(true);
+
+    let insert_rows: Vec<_> = deck_ids
+        .into_iter()
+        .map(|deck_id| (
+            Card_Deck::card.eq(card_id),
+            Card_Deck::deck.eq(deck_id),
+        ))
+        .collect();
+    insert_into(Card_Deck::table).values(insert_rows).execute(conn)?;
+
+    Ok(())
+}
+
+pub fn load_card_decks(card_id: i32) -> Vec<i32> {
+    use schema::Card_Deck;
+    let conn = &mut establish_connection(true);
+
+    Card_Deck::table.filter(Card_Deck::card.eq(card_id))
+        .select(Card_Deck::deck)
+        .load::<i32>(conn)
+        .unwrap()
+}

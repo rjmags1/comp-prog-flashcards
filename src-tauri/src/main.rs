@@ -38,6 +38,11 @@ fn load_user_decks(user_id: i32) -> database::UserDecksData {
 }
 
 #[tauri::command]
+fn load_card_decks(card_id: i32) -> Vec<i32> {
+    database::load_card_decks(card_id)
+}
+
+#[tauri::command]
 fn update_deck(
     deck_id: i32,
     name: String,
@@ -111,6 +116,16 @@ fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
     database::load_card_titles(deck_id)
 }
 
+#[tauri::command]
+fn add_card_to_deck(card_id: i32, deck_ids: Vec<i32>) -> Result<(), String> {
+    let add_result = database::add_card_to_deck(card_id, deck_ids);
+
+    match add_result {
+        Ok(_) => Ok(()),
+        Err(e) => Err(format!("Card deck association failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -125,7 +140,9 @@ fn main() {
                 load_card_metadata,
                 load_card,
                 add_card,
-                load_card_titles
+                load_card_titles,
+                add_card_to_deck,
+                load_card_decks
             ]
         )
         .run(tauri::generate_context!())
