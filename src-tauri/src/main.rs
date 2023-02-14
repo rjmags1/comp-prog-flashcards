@@ -117,8 +117,8 @@ fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
 }
 
 #[tauri::command]
-fn add_card_to_deck(card_id: i32, deck_ids: Vec<i32>) -> Result<(), String> {
-    let add_result = database::add_card_to_deck(card_id, deck_ids);
+fn add_card_to_decks(card_id: i32, deck_ids: Vec<i32>) -> Result<(), String> {
+    let add_result = database::add_card_to_decks(card_id, deck_ids);
 
     match add_result {
         Ok(_) => Ok(()),
@@ -146,6 +146,30 @@ fn update_card_mastery(card_id: i32, status: bool) -> Result<bool, String> {
     }
 }
 
+#[tauri::command]
+fn add_tags_to_card(card_id: i32, tag_ids: Vec<i32>) -> Result<(), String> {
+    let add_result = database::add_tags_to_card(card_id, tag_ids);
+
+    match add_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Tags add failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn add_tag(
+    tag_type: String,
+    name: String,
+    content: Option<String>
+) -> Result<database::TagData, String> {
+    let add_result = database::add_tag(tag_type, name, content);
+
+    match add_result {
+        Ok(tag_data) => Ok(tag_data),
+        Err(e) => Err(format!("Tag add failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -161,10 +185,12 @@ fn main() {
                 load_card,
                 add_card,
                 load_card_titles,
-                add_card_to_deck,
+                add_card_to_decks,
                 load_card_decks,
                 delete_card_from_deck,
-                update_card_mastery
+                update_card_mastery,
+                add_tags_to_card,
+                add_tag
             ]
         )
         .run(tauri::generate_context!())

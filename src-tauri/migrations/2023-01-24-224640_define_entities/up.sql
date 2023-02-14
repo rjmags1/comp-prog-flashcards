@@ -104,7 +104,7 @@ CREATE TABLE Solution (
 CREATE TABLE Tag (
     id INTEGER PRIMARY KEY NOT NULL,
     type INTEGER NOT NULL,
-    name TEXT,
+    name TEXT NOT NULL UNIQUE,
     content TEXT,
     FOREIGN KEY(type) REFERENCES TagTypeEnum(enum_val)
 );

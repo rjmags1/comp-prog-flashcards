@@ -91,7 +91,7 @@ diesel::table! {
         id -> Integer,
         #[sql_name = "type"]
         type_ -> Integer,
-        name -> Nullable<Text>,
+        name -> Text,
         content -> Nullable<Text>,
     }
 }

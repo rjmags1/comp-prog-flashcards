@@ -16,7 +16,7 @@ function CardHeader({ cardData, flipper }: CardHeaderProps) {
             </span>
             <Tooltip anchorId="flip-button" />
             <button
-                onClick={() => flipper()}
+                onClick={flipper}
                 data-tooltip-content="Click or type spacebar to flip"
                 id="flip-button"
                 className="h-fit rounded-md border border-black 

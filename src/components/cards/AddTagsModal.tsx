@@ -2,9 +2,15 @@ import Modal from "../general/Modal"
 import Select from "react-select"
 import { useContext, useState } from "react"
 import { AppContext } from "../../app/App"
-import { AddTagsModalProps, AppLevelContext, Tag } from "../../types"
+import {
+    AddTagsModalProps,
+    AppLevelContext,
+    DeckLevelContext,
+} from "../../types"
 import NewTagForm from "./NewTagForm"
 import ExitButton from "../general/ExitButton"
+import { DeckContext } from "../../pages/CardsPage"
+import { invoke } from "@tauri-apps/api"
 
 // TODO: tauri command + logic for adding new tag association into db
 
@@ -15,6 +21,7 @@ type TagOption = {
 
 function AddTagsModal({ cardTags, unrender, adder }: AddTagsModalProps) {
     const { tags } = useContext(AppContext) as AppLevelContext
+    const { currentCardId } = useContext(DeckContext) as DeckLevelContext
     const [addedTagOptions, setAddedTagOptions] = useState<TagOption[]>([])
 
     const cardTagIds = new Set(Array.from(cardTags.map((t) => t.id)))
@@ -25,10 +32,15 @@ function AddTagsModal({ cardTags, unrender, adder }: AddTagsModalProps) {
             label: tag.name,
         }))
 
-    const onAdd = () => {
-        // tauri command logic for associating more tags with card
-
-        adder(addedTagOptions.map((o) => tags.get(o.value) as Tag))
+    const onAdd = async () => {
+        try {
+            const tagIds = addedTagOptions.map((o) => o.value)
+            await invoke("add_tags_to_card", { cardId: currentCardId, tagIds })
+            adder(tagIds.map((id) => tags.get(id)!))
+            unrender()
+        } catch (e) {
+            console.error(e)
+        }
     }
 
     return (

@@ -58,7 +58,7 @@ pub struct SourceData {
 
 type ThemeEnumRow = (i32, String);
 type UserInfoRow = (i32, String, i32, bool, Option<String>, Option<String>);
-type TagRow = (i32, Option<String>, Option<String>, Option<String>);
+type TagRow = (i32, String, Option<String>, Option<String>);
 type SourceRow = (i32, String);
 
 pub fn load_app_context() -> AppContextDbData {
@@ -108,7 +108,7 @@ pub fn load_app_context() -> AppContextDbData {
         .into_iter()
         .map(|row| TagData {
             id: row.0,
-            name: row.1.unwrap(),
+            name: row.1,
             content: row.2,
             tag_type: row.3.unwrap(),
         })
@@ -544,7 +544,7 @@ pub fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
         .unwrap()
 }
 
-pub fn add_card_to_deck(
+pub fn add_card_to_decks(
     card_id: i32,
     deck_ids: Vec<i32>
 ) -> Result<(), Box<dyn Error>> {
@@ -614,4 +614,57 @@ pub fn update_card_mastery(
         .execute(conn)?;
 
     Ok(status)
+}
+
+pub fn add_tags_to_card(
+    card_id: i32,
+    tag_ids: Vec<i32>
+) -> Result<(), Box<dyn Error>> {
+    use schema::Card_Tag;
+    let conn = &mut establish_connection(false);
+
+    let insert_rows: Vec<_> = tag_ids
+        .into_iter()
+        .map(|tag_id| (Card_Tag::card.eq(card_id), Card_Tag::tag.eq(tag_id)))
+        .collect();
+    insert_into(Card_Tag::table).values(insert_rows).execute(conn)?;
+
+    Ok(())
+}
+
+pub fn add_tag(
+    tag_type: String,
+    name: String,
+    content: Option<String>
+) -> Result<TagData, Box<dyn Error>> {
+    use schema::{ TagTypeEnum, Tag };
+    let conn = &mut establish_connection(false);
+
+    let tag_type_enum_val = TagTypeEnum::table.filter(
+        TagTypeEnum::name.eq(&tag_type)
+    )
+        .select(TagTypeEnum::enum_val)
+        .load::<i32>(conn)?[0];
+    insert_into(Tag::table)
+        .values((
+            Tag::type_.eq(tag_type_enum_val),
+            Tag::name.eq(name),
+            Tag::content.eq(content),
+        ))
+        .execute(conn)?;
+    let (id, name, content): (i32, String, Option<String>) = Tag::table.select((
+        Tag::id,
+        Tag::name,
+        Tag::content.nullable(),
+    ))
+        .order_by(Tag::id.desc())
+        .limit(1)
+        .first(conn)?;
+
+    Ok(TagData {
+        id,
+        name,
+        content,
+        tag_type,
+    })
 }
