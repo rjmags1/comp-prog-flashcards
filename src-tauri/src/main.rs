@@ -180,6 +180,19 @@ fn delete_tag_from_card(card_id: i32, tag_id: i32) -> Result<(), String> {
     }
 }
 
+#[tauri::command]
+fn update_card_prompt(
+    card_front_id: i32,
+    prompt: String
+) -> Result<String, String> {
+    let update_result = database::update_card_prompt(card_front_id, prompt);
+
+    match update_result {
+        Ok(updated_prompt) => Ok(updated_prompt),
+        Err(e) => Err(format!("prompt update failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -201,7 +214,8 @@ fn main() {
                 update_card_mastery,
                 add_tags_to_card,
                 add_tag,
-                delete_tag_from_card
+                delete_tag_from_card,
+                update_card_prompt
             ]
         )
         .run(tauri::generate_context!())

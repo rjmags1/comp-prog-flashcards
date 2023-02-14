@@ -3,6 +3,7 @@ import { CardFrontProps } from "../../types"
 import MarkdownPreview from "@uiw/react-markdown-preview"
 import MarkdownEditor from "@uiw/react-markdown-editor"
 import { useCardFrontHandleResize, useOutsideClickHandler } from "../../hooks"
+import { invoke } from "@tauri-apps/api"
 
 document.documentElement.setAttribute("data-color-mode", "light")
 
@@ -19,6 +20,18 @@ function CardFront({ cardData }: CardFrontProps) {
         setPrompt(cardData.prompt)
     }, [cardData])
 
+    const editsSaver = async (prompt: string) => {
+        try {
+            await invoke("update_card_prompt", {
+                cardFrontId: cardData.metadata.front,
+                prompt,
+            })
+            setPrompt(prompt)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     return editMode ? (
         <div
             ref={outsideRef as any}
@@ -28,7 +41,7 @@ function CardFront({ cardData }: CardFrontProps) {
         >
             <MarkdownEditor
                 value={prompt}
-                onChange={setPrompt}
+                onChange={(edited) => editsSaver(edited)}
                 enableScroll={false}
             />
         </div>

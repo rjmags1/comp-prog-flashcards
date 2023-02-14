@@ -684,3 +684,18 @@ pub fn delete_tag_from_card(
 
     Ok(())
 }
+
+pub fn update_card_prompt(
+    card_front_id: i32,
+    prompt: String
+) -> Result<String, Box<dyn Error>> {
+    use schema::CardFront;
+    let conn = &mut establish_connection(false);
+
+    update(CardFront::table)
+        .filter(CardFront::id.eq(card_front_id))
+        .set(CardFront::prompt.eq(&prompt))
+        .execute(conn)?;
+
+    Ok(prompt)
+}
