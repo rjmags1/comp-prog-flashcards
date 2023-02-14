@@ -668,3 +668,19 @@ pub fn add_tag(
         tag_type,
     })
 }
+
+pub fn delete_tag_from_card(
+    card_id: i32,
+    tag_id: i32
+) -> Result<(), Box<dyn Error>> {
+    use schema::Card_Tag;
+    let conn = &mut establish_connection(false);
+
+    delete(
+        Card_Tag::table.filter(Card_Tag::card.eq(card_id)).filter(
+            Card_Tag::tag.eq(tag_id)
+        )
+    ).execute(conn)?;
+
+    Ok(())
+}

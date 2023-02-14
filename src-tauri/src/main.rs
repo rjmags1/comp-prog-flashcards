@@ -170,6 +170,16 @@ fn add_tag(
     }
 }
 
+#[tauri::command]
+fn delete_tag_from_card(card_id: i32, tag_id: i32) -> Result<(), String> {
+    let delete_result = database::delete_tag_from_card(card_id, tag_id);
+
+    match delete_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Delete tag failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -190,7 +200,8 @@ fn main() {
                 delete_card_from_deck,
                 update_card_mastery,
                 add_tags_to_card,
-                add_tag
+                add_tag,
+                delete_tag_from_card
             ]
         )
         .run(tauri::generate_context!())

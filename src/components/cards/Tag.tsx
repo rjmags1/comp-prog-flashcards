@@ -1,22 +1,23 @@
-import { useState, useEffect } from "react"
+import { invoke } from "@tauri-apps/api"
+import { useState } from "react"
 import { Tooltip } from "react-tooltip"
 import { TagProps } from "../../types"
 import PopupMessage from "../general/PopupMessage"
 
-// TODO: remove tag associations via tauri command
-
-function Tag({ tagData, color, remover }: TagProps) {
+function Tag({ tagData, color, remover, cardData }: TagProps) {
     const anchorId = `tag-${tagData.id}`
     const [renderPopup, setRenderPopup] = useState(false)
-    const [deleted, setDeleted] = useState(false)
 
-    useEffect(() => {
-        if (deleted) {
-            // remove association via tauri command
-
+    const doDelete = async () => {
+        const { id: tagId } = tagData
+        try {
+            await invoke("delete_tag_from_card", { cardId: cardData.id, tagId })
             remover()
+            setRenderPopup(false)
+        } catch (e) {
+            console.error(e)
         }
-    }, [deleted])
+    }
 
     return (
         <div
@@ -31,8 +32,7 @@ function Tag({ tagData, color, remover }: TagProps) {
                     message={`Remove '${tagData.name}' tag from this card?`}
                     whiteText
                     unrender={(d?: boolean) => {
-                        setRenderPopup(false)
-                        setDeleted(d as boolean)
+                        if (d) doDelete()
                     }}
                 />
             )}

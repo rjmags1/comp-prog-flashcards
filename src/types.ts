@@ -194,6 +194,7 @@ export interface PromptProps {
 
 export interface TagProps {
     tagData: Tag
+    cardData: CardMetadata
     color: ColorPalette
     remover: () => void
 }
