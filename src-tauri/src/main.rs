@@ -106,6 +106,11 @@ fn add_card(
     }
 }
 
+#[tauri::command]
+fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
+    database::load_card_titles(deck_id)
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -119,7 +124,8 @@ fn main() {
                 add_deck,
                 load_card_metadata,
                 load_card,
-                add_card
+                add_card,
+                load_card_titles
             ]
         )
         .run(tauri::generate_context!())

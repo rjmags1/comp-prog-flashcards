@@ -1,32 +1,28 @@
 import { DeckContext } from "../../pages/CardsPage"
 import { useContext, useEffect, useState } from "react"
 import { DeckLevelContext } from "../../types"
-import Select, { Options } from "react-select"
-
-// TODO:
-//    - tauri command to get titles of all cards in the current deck
-//        - to fill allTitles state
-
-const tempTitles = [
-    "tempTitle1",
-    "tempTitle2",
-    "tempTitle3",
-    "tempTitle4",
-    "tempTitle5",
-    "tempTitle6",
-    "tempTitle7",
-    "tempTitle8",
-]
-const tempTitlesMap: Map<number, string> = new Map()
-tempTitles.forEach((t, i) => {
-    tempTitlesMap.set(i + 1, t)
-})
+import Select, { createFilter, Options } from "react-select"
+import { invoke } from "@tauri-apps/api"
+import React from "react"
 
 type CardTitleOption = {
     label: string
     value: string
     id: number
 }
+
+const CustomOption = React.memo((props: any) => {
+    const { onMouseMove, onMouseOver, ...rest } = props.innerProps
+    const newProps = { ...props, innerProps: rest }
+    return (
+        <div
+            {...newProps.innerProps}
+            className="p-1 hover:cursor-pointer hover:bg-emerald-200"
+        >
+            {newProps.data.label}
+        </div>
+    )
+})
 
 function CardTitleDatalist() {
     const [allTitles, setAllTitles] = useState<Map<number, string>>(new Map())
@@ -37,32 +33,40 @@ function CardTitleDatalist() {
     useEffect(() => {
         if (allTitles.size > 0) return
 
-        // tauri command logic here
+        const titlesLoader = async () => {
+            const titlesTuples: Iterable<readonly [number, string]> =
+                await invoke("load_card_titles", {
+                    deckId: currentDeck,
+                })
+            setAllTitles(new Map(titlesTuples))
+        }
 
-        setAllTitles(tempTitlesMap)
+        titlesLoader()
     })
 
-    const options: Options<CardTitleOption> = []
-    //allTitles.size === 0
-    //? []
-    //: Array.from(filteredCards.keys())
-    //.filter(
-    //(id) =>
-    //filteredCards.has(id) &&
-    //allTitles.get(id)!.indexOf(searchText) > -1
-    //)
-    //.map((id) => ({
-    //label: allTitles.get(id)!,
-    //value: allTitles.get(id)!,
-    //id: id,
-    //}))
+    const options: Options<CardTitleOption> =
+        allTitles.size === 0
+            ? []
+            : Array.from(filteredCards.keys())
+                  .filter(
+                      (id) =>
+                          filteredCards.has(id) &&
+                          allTitles.get(id)!.indexOf(searchText) > -1
+                  )
+                  .map((id) => ({
+                      label: allTitles.get(id)!,
+                      value: allTitles.get(id)!,
+                      id: id,
+                  }))
 
     return (
         <Select
+            components={{ Option: CustomOption }}
             className="w-full"
             options={options}
             closeMenuOnSelect={true}
             value={null}
+            filterOption={createFilter({ ignoreAccents: false })}
             placeholder="List, search cards by text..."
             onChange={(option) => {
                 updater!({

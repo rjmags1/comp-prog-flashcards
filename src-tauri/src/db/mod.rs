@@ -525,3 +525,14 @@ pub fn add_card(
         tags: vec![],
     })
 }
+
+pub fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
+    use schema::{ CardFront, Card_Deck };
+    let conn = &mut establish_connection(true);
+
+    Card_Deck::table.filter(Card_Deck::deck.eq(deck_id))
+        .inner_join(CardFront::table.on(CardFront::card.eq(Card_Deck::card)))
+        .select((CardFront::card, CardFront::title))
+        .load::<(i32, String)>(conn)
+        .unwrap()
+}
