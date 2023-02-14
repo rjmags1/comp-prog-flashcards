@@ -27,7 +27,7 @@ function CardHeader({ cardData, flipper }: CardHeaderProps) {
             </button>
             <AddCardToDeckButton />
             <DeleteCardFromDeckButton />
-            <ToggleMasteryButton status={false} />
+            <ToggleMasteryButton />
         </div>
     )
 }

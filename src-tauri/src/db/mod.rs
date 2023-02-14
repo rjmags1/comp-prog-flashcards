@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::error::Error;
 
 use diesel::connection::SimpleConnection;
-use diesel::dsl::count_star;
 use diesel::sqlite::SqliteConnection;
 use diesel::{ prelude::*, insert_into, update, delete };
 use crate::schema;
@@ -245,8 +244,7 @@ pub fn update_deck(
     use schema::Deck;
     let conn = &mut establish_connection(false);
 
-    diesel
-        ::update(Deck::table.filter(Deck::id.eq(deck_id)))
+    update(Deck::table.filter(Deck::id.eq(deck_id)))
         .set((
             Deck::name.eq(name),
             Deck::size.eq(size),
@@ -602,4 +600,18 @@ pub fn delete_card_from_deck(
 
         Ok(card_id)
     })
+}
+
+pub fn update_card_mastery(
+    card_id: i32,
+    status: bool
+) -> Result<bool, Box<dyn Error>> {
+    use schema::Card;
+    let conn = &mut establish_connection(false);
+
+    update(Card::table.filter(Card::id.eq(card_id)))
+        .set(Card::mastered.eq(status))
+        .execute(conn)?;
+
+    Ok(status)
 }

@@ -136,6 +136,16 @@ fn delete_card_from_deck(card_id: i32, deck_id: i32) -> Result<i32, String> {
     }
 }
 
+#[tauri::command]
+fn update_card_mastery(card_id: i32, status: bool) -> Result<bool, String> {
+    let update_result = database::update_card_mastery(card_id, status);
+
+    match update_result {
+        Ok(new_status) => Ok(new_status),
+        Err(e) => Err(format!("Card update failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -153,7 +163,8 @@ fn main() {
                 load_card_titles,
                 add_card_to_deck,
                 load_card_decks,
-                delete_card_from_deck
+                delete_card_from_deck,
+                update_card_mastery
             ]
         )
         .run(tauri::generate_context!())

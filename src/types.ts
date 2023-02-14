@@ -313,10 +313,6 @@ export interface ScrollButtonProps {
     direction: ScrollDirection
 }
 
-export interface ToggleMasteryButtonProps {
-    status: boolean
-}
-
 ///////////////////////////
 ////////// DECKS //////////
 ///////////////////////////
