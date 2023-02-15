@@ -5,8 +5,21 @@ use diesel::connection::SimpleConnection;
 use diesel::sqlite::SqliteConnection;
 use diesel::{ prelude::*, insert_into, update, delete };
 use crate::schema;
+use diesel_migrations::{
+    embed_migrations,
+    EmbeddedMigrations,
+    MigrationHarness,
+};
 
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
 const DATABASE_URL: &str = "sqlite://cpf.db";
+
+pub fn run_migrations() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
+    let conn = &mut establish_connection(false);
+    conn.run_pending_migrations(MIGRATIONS)?;
+
+    Ok(())
+}
 
 pub fn establish_connection(disable_fk: bool) -> SqliteConnection {
     let mut conn = SqliteConnection::establish(DATABASE_URL).unwrap_or_else(|_|

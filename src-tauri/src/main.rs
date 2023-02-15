@@ -266,6 +266,8 @@ fn delete_user(user_id: i32) -> Result<(), String> {
 }
 
 fn main() {
+    database::run_migrations().expect("embedded migrations failed");
+
     tauri::Builder
         ::default()
         .invoke_handler(
