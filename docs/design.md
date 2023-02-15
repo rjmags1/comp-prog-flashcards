@@ -802,26 +802,23 @@ SELECT * FROM TagTypeEnum;
     - See the Component Tree ([.png](cpf-component-tree.png)) ([.svg](cpf-component-tree.svg))
     - For markdown rendering and editing, see: https://github.com/uiwjs/react-markdown-preview and https://github.com/uiwjs/react-markdown-editor
 
-### Phase 3
+### **[ ✅ ]** Phase 3
 
-- Make the frontend call Tauri commands and add interactivity to the static components. **[test]**
+- **[ ✅ ]** Make the frontend call Tauri commands and add interactivity to the static components. **[test]**
     - Go through each page of app and implement necessary commands for data fetching as needed
     - Will need to use transactions for certain operations (add new card, etc.): https://docs.rs/diesel/latest/diesel/pg/struct.TransactionBuilder.html
-    - For certain commands just do a direct translation into diesel method calls, for others use query wrapper that call multiple separate diesel queries
-- The app should be a fully functional MVP after this phase.
+    - For certain commands just do a direct translation into diesel method calls, for others use query wrapper that call multiple separate diesel queries. 
+- **[ ✅ ]** The app should be a fully (untested) functional MVP after this phase.
 
 ### Phase 4
-- Test all above functionality annotated as needing it
-- Playwright for e2e testing?
-- ## TODO: more details
-
-### Phase 5
 - Clean up the UI
   - Make sure styles are completely consistent
   - Implement hotkeys for certain actions (spacebar for card flip, arrow keys for scroll to next/prev card) 
 - Add tooltips where needed (hotkeys, hover descriptions, etc.)
 - Handle large filter tag lists (i.e. 5 selected paradigm tags)
-- ## TODO: more details
+
+### Phase 5
+- Test all above functionality annotated as needing it
 
 ### Phase 6
 - other ideas?
