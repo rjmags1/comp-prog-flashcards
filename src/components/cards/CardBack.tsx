@@ -1,84 +1,107 @@
+import { invoke } from "@tauri-apps/api"
 import MarkdownEditor from "@uiw/react-markdown-editor"
 import MarkdownPreview from "@uiw/react-markdown-preview"
 import { useState, useEffect } from "react"
 import { useCardBackHandleResize, useOutsideClickHandler } from "../../hooks"
-import { CardBackProps, Tab } from "../../types"
+import { CardBackProps, Solution, Tab } from "../../types"
 import PopupMessage from "../general/PopupMessage"
 import NewTabButton from "./NewTabButton"
 import Tab_ from "./Tab"
 
 function CardBack({ cardData }: CardBackProps) {
     const [tabs, setTabs] = useState<Tab[]>([])
-    const [tabIdx, setTabIdx] = useState(0)
-    const [selectedTab, setSelectedTab] = useState<Tab | null>(null)
+    const [tabIdx, setTabIdx] = useState<null | number>(null)
     const [tabContent, setTabContent] = useState("")
-    const [addingNew, setAddingNew] = useState(false)
     const [renderDeletePopup, setRenderDeletePopup] = useState(false)
-    const cardBackSize = useCardBackHandleResize()
+    const [addingNew, setAddingNew] = useState(false)
+    const cardBackSize = useCardBackHandleResize(tabIdx)
     const {
         ref: outsideRef,
         render: editMode,
         setRender: setEditMode,
     } = useOutsideClickHandler(false)
 
-    // fill tabs using cardData
+    // load tabs into state
     useEffect(() => {
+        const { notes, solutions } = cardData
         setTabs([
-            {
-                title: "Notes",
-                content: cardData.notes,
-                index: 0,
-            },
-            ...cardData.solutions.map(({ name, content }, i) => ({
+            { title: "Notes", content: notes, index: 0 },
+            ...solutions.map(({ name, content, id }, i) => ({
+                solutionId: id,
                 title: name,
                 content,
                 index: i + 1,
             })),
         ])
+
+        setTabIdx(0)
+        setTabContent(notes)
+        return () => setTabIdx(null)
     }, [cardData])
 
-    // UI tab change --> setTabIdx --> below effect trigger
-    //    --> update db and JS tab data --> setSelectedTab, setTabContent
-    //    --> update UI to new tab
+    // display tabs content
     useEffect(() => {
-        if (tabs.length === 0) return
+        if (tabIdx === null) return
         if (addingNew) {
             setTabContent("")
-            setSelectedTab(null)
             return
         }
-        if (selectedTab !== null && selectedTab.content !== tabContent) {
-            // write to db
-            // ....
 
-            setTabs((prev) => [
-                ...prev.slice(0, selectedTab.index),
-                {
-                    title: selectedTab.title,
-                    content: tabContent,
-                    index: selectedTab.index,
-                },
-                ...prev.slice(selectedTab.index + 1),
-            ])
-        }
-        // tabIdx will be tabs.length when addingNew
-        if (tabIdx < tabs.length) {
-            setSelectedTab(tabs[tabIdx])
-            setTabContent(tabs[tabIdx].content)
-        }
+        setTabContent(tabs[tabIdx].content)
+    }, [tabIdx, addingNew])
 
-        return () => setEditMode(false)
-    }, [tabIdx, tabs])
-
+    // edit tab contents
     useEffect(() => {
-        return () => {
-            if (selectedTab !== null && selectedTab.content !== tabContent) {
-                // write to db on tab unmount if needed
+        if (addingNew || !tabContent || tabIdx === null) return
+
+        const editSaver = async () => {
+            const oldTab = tabs[tabIdx]
+            if (oldTab.content !== tabContent) {
+                const notes = tabIdx === 0
+                const editedId = notes
+                    ? cardData.metadata.back
+                    : tabs[tabIdx].solutionId!
+                await invoke("update_notes_or_solution_content", {
+                    notes,
+                    editedId,
+                    content: tabContent,
+                })
+
+                const updated: Tab = { ...oldTab, content: tabContent }
+                setTabs([
+                    ...tabs.slice(0, tabIdx),
+                    updated,
+                    ...tabs.slice(tabIdx + 1),
+                ])
             }
         }
-    }, [selectedTab])
 
-    return (
+        editSaver()
+    }, [tabContent])
+
+    const newTabSaver = async (
+        name: string,
+        content: string,
+        cardBackId: number
+    ) => {
+        try {
+            await invoke("add_solution", { name, content, cardBackId })
+
+            const newTab: Tab = {
+                title: name,
+                content: tabContent,
+                index: tabs.length,
+            }
+            setTabIdx(tabs.length)
+            setTabs((prev) => [...prev, newTab])
+            setAddingNew(false)
+            setEditMode(false)
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    return tabIdx === null ? null : (
         <div
             className="w-full overflow-hidden"
             ref={addingNew ? null : (outsideRef as any)}
@@ -101,26 +124,19 @@ function CardBack({ cardData }: CardBackProps) {
                 <NewTabButton
                     addingNew={addingNew}
                     opener={() => {
-                        setEditMode(true)
                         setAddingNew(true)
-                        setTabIdx(tabs.length)
                     }}
-                    saver={(newTitle: string) => {
-                        // write to db
-                        const newTab: Tab = {
-                            title: newTitle,
-                            content: tabContent,
-                            index: tabIdx,
-                        }
-                        setTabs((prev) => [...prev, newTab])
-                        setSelectedTab(newTab)
-                        setAddingNew(false)
-                        setEditMode(false)
+                    saver={async (newTitle: string) => {
+                        newTabSaver(
+                            newTitle,
+                            tabContent,
+                            cardData.metadata.back
+                        )
                     }}
                     discarder={() => {
                         setAddingNew(false)
-                        setTabIdx(0)
                         setEditMode(false)
+                        setTabIdx(0)
                     }}
                 />
             </div>
@@ -154,9 +170,7 @@ function CardBack({ cardData }: CardBackProps) {
             )}
             {renderDeletePopup && (
                 <PopupMessage
-                    message={`Are you sure you want to delete ${
-                        selectedTab!.title
-                    }`}
+                    message={`Are you sure you want to delete ${""}`}
                     whiteText
                     unrender={(d?: boolean) => {
                         setRenderDeletePopup(false)

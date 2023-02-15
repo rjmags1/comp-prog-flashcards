@@ -193,6 +193,38 @@ fn update_card_prompt(
     }
 }
 
+#[tauri::command]
+fn update_notes_or_solution_content(
+    notes: bool,
+    edited_id: i32,
+    content: String
+) -> Result<(), String> {
+    let update_result = database::update_notes_or_solution_content(
+        notes,
+        edited_id,
+        content
+    );
+
+    match update_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Tab update failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn add_solution(
+    name: String,
+    content: String,
+    card_back_id: i32
+) -> Result<(), String> {
+    let add_result = database::add_solution(name, content, card_back_id);
+
+    match add_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Solution add failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -215,7 +247,9 @@ fn main() {
                 add_tags_to_card,
                 add_tag,
                 delete_tag_from_card,
-                update_card_prompt
+                update_card_prompt,
+                update_notes_or_solution_content,
+                add_solution
             ]
         )
         .run(tauri::generate_context!())

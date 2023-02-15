@@ -699,3 +699,45 @@ pub fn update_card_prompt(
 
     Ok(prompt)
 }
+
+pub fn update_notes_or_solution_content(
+    notes: bool,
+    edited_id: i32,
+    content: String
+) -> Result<(), Box<dyn Error>> {
+    use schema::{ CardBack, Solution };
+    let conn = &mut establish_connection(false);
+
+    if notes {
+        update(CardBack::table)
+            .filter(CardBack::id.eq(edited_id))
+            .set(CardBack::notes.eq(content))
+            .execute(conn)?;
+    } else {
+        update(Solution::table)
+            .filter(Solution::id.eq(edited_id))
+            .set(Solution::content.eq(content))
+            .execute(conn)?;
+    }
+
+    Ok(())
+}
+
+pub fn add_solution(
+    name: String,
+    content: String,
+    card_back_id: i32
+) -> Result<(), Box<dyn Error>> {
+    use schema::Solution;
+    let conn = &mut establish_connection(false);
+
+    insert_into(Solution::table)
+        .values((
+            Solution::name.eq(name),
+            Solution::content.eq(content),
+            Solution::cardback.eq(card_back_id),
+        ))
+        .execute(conn)?;
+
+    Ok(())
+}

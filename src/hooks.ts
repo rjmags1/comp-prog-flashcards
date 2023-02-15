@@ -43,7 +43,7 @@ export function useCardFrontHandleResize() {
     return size
 }
 
-export function useCardBackHandleResize() {
+export function useCardBackHandleResize(tabIdx: number | null) {
     const [_, setTicker] = useState(0)
     const tick = useCallback(() => setTicker((t) => t + 1), [])
 
@@ -51,6 +51,10 @@ export function useCardBackHandleResize() {
         window.addEventListener("resize", tick)
         return () => window.removeEventListener("resize", tick)
     }, [])
+
+    useEffect(() => {
+        tick()
+    }, [tabIdx])
 
     const cardHeight = document.getElementById("card")?.getBoundingClientRect()
         .height!

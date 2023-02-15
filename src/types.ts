@@ -231,6 +231,7 @@ export interface DeckLevelContext {
 
 export interface Tab {
     title: string
+    solutionId?: number
     content: string
     index: number
 }
@@ -238,7 +239,7 @@ export interface Tab {
 export interface NewTabProps {
     addingNew: boolean
     opener: () => void
-    saver: (newTitle: string) => void
+    saver: (newTitle: string) => Promise<void>
     discarder: () => void
 }
 
@@ -261,6 +262,7 @@ export interface Card {
 
 export interface Solution {
     id: number
+    cardBack: number
     name: string
     content: string
 }
