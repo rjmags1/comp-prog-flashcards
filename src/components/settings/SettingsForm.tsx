@@ -1,12 +1,9 @@
+import { invoke } from "@tauri-apps/api"
 import { useContext, useState } from "react"
 import Select from "react-select"
 import { AppContext } from "../../app/App"
-import { AppLevelContext, Page, TagType } from "../../types"
+import { AppLevelContext, Page, TagType, Theme, ThemeLookup } from "../../types"
 import PopupMessage from "../general/PopupMessage"
-
-// TODO:
-//    - tauri command for updating user settings
-//    - tauri command for deleting user account
 
 type ThemeOption = {
     label: string
@@ -57,6 +54,85 @@ function SettingsForm() {
     if (tagMask & 2) hiddenTags.push(tagTypeOptions[1])
     if (tagMask & 4) hiddenTags.push(tagTypeOptions[2])
 
+    const updateTheme = async (newTheme: ThemeOption) => {
+        try {
+            await invoke("update_theme", {
+                userId: currentUser,
+                theme: newTheme.value,
+            })
+
+            updater!({
+                ...appContext,
+                currentTheme: ThemeLookup.get(newTheme.value)!,
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const updateHideDifficulty = async (hidediffs: boolean) => {
+        try {
+            await invoke("update_hide_difficulty", {
+                userId: currentUser,
+                hidediffs,
+            })
+
+            const updatedUser = {
+                ...userInfo,
+                hidediffs,
+            }
+            const newUsers = new Map(users)
+            newUsers.set(currentUser!, updatedUser)
+            updater!({
+                ...appContext,
+                users: newUsers,
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const updateTagmask = async (tagmask: number) => {
+        try {
+            await invoke("update_tag_mask", {
+                userId: currentUser,
+                tagmask,
+            })
+
+            const updatedUser = {
+                ...userInfo,
+                tagMask: tagmask,
+            }
+            const newUsers = new Map(users)
+            newUsers.set(currentUser!, updatedUser)
+            updater!({
+                ...appContext,
+                users: newUsers,
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
+    const doDelete = async () => {
+        try {
+            await invoke("delete_user", {
+                userId: currentUser,
+            })
+
+            const newUsers = new Map(users)
+            newUsers.delete(currentUser!)
+            updater!({
+                ...appContext,
+                users: newUsers,
+                pageHistory: [...pageHistory, [Page.Login, null]],
+                currentUser: null,
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
+
     return (
         <div
             className="no-scrollbar flex h-[90%] flex-col 
@@ -69,15 +145,13 @@ function SettingsForm() {
                 <h5 className="mb-2 text-xl italic">Change Theme:</h5>
                 <Select
                     defaultValue={currentTheme}
-                    inputValue={currentTheme}
                     value={currentTheme}
+                    placeholder={currentTheme}
+                    isSearchable={false}
                     options={themeOptions as any}
                     className="w-full min-w-[300px] text-black"
                     onChange={(newOption) =>
-                        updater!({
-                            ...appContext,
-                            currentTheme: newOption!,
-                        })
+                        updateTheme(newOption! as unknown as ThemeOption)
                     }
                     styles={{
                         input: (baseStyles, state) => ({
@@ -93,6 +167,10 @@ function SettingsForm() {
                             ...baseStyles,
                             marginBottom: "1.5rem",
                         }),
+                        placeholder: (baseStyles, state) => ({
+                            ...baseStyles,
+                            color: "black",
+                        }),
                     }}
                 />
                 <div className="mb-6 flex gap-x-2">
@@ -100,18 +178,7 @@ function SettingsForm() {
                     <input
                         type="checkbox"
                         className="w-5 outline-none"
-                        onChange={(e) => {
-                            const updatedUser = {
-                                ...userInfo,
-                                hideDiffs: e.target.checked,
-                            }
-                            const newUsers = new Map(users)
-                            newUsers.set(currentUser!, updatedUser)
-                            updater!({
-                                ...appContext,
-                                users: newUsers,
-                            })
-                        }}
+                        onChange={(e) => updateHideDifficulty(e.target.checked)}
                     />
                 </div>
                 <h5 className="mb-2 text-xl italic">Hide tags:</h5>
@@ -119,23 +186,15 @@ function SettingsForm() {
                     isMulti={true}
                     isSearchable={false}
                     defaultValue={hiddenTags}
+                    closeMenuOnSelect={false}
                     options={tagTypeOptions as any}
                     className="w-full min-w-[300px] text-black"
                     onChange={(selectedTagTypeOptions) => {
-                        let newMask = 0
-                        selectedTagTypeOptions.forEach(
-                            (t) => (newMask += t.bit)
+                        updateTagmask(
+                            selectedTagTypeOptions
+                                .map((t) => t.bit)
+                                .reduce((mask, bit) => (mask += bit), 0)
                         )
-                        const updatedUser = {
-                            ...userInfo,
-                            tagMask: newMask,
-                        }
-                        const newUsers = new Map(users)
-                        newUsers.set(currentUser!, updatedUser)
-                        updater!({
-                            ...appContext,
-                            users: newUsers,
-                        })
                     }}
                     styles={{
                         input: (baseStyles, state) => ({
@@ -180,19 +239,7 @@ function SettingsForm() {
                     whiteText
                     unrender={(d?: boolean) => {
                         setRenderPopup(false)
-                        if (d) {
-                            const newUsers = new Map(users)
-                            newUsers.delete(currentUser!)
-                            updater!({
-                                ...appContext,
-                                users: newUsers,
-                                pageHistory: [
-                                    ...pageHistory,
-                                    [Page.Login, null],
-                                ],
-                                currentUser: null,
-                            })
-                        }
+                        if (d) doDelete()
                     }}
                 />
             )}

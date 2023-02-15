@@ -225,6 +225,46 @@ fn add_solution(
     }
 }
 
+#[tauri::command]
+fn update_theme(user_id: i32, theme: String) -> Result<(), String> {
+    let update_result = database::update_theme(user_id, theme);
+
+    match update_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Theme update failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn update_hide_difficulty(user_id: i32, hidediffs: bool) -> Result<(), String> {
+    let update_result = database::update_hide_difficulty(user_id, hidediffs);
+
+    match update_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Difficulty settings update failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn update_tag_mask(user_id: i32, tagmask: i32) -> Result<(), String> {
+    let update_result = database::update_tag_mask(user_id, tagmask);
+
+    match update_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Tag settings update failure: {}", e)),
+    }
+}
+
+#[tauri::command]
+fn delete_user(user_id: i32) -> Result<(), String> {
+    let update_result = database::delete_user(user_id);
+
+    match update_result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("User delete failure: {}", e)),
+    }
+}
+
 fn main() {
     tauri::Builder
         ::default()
@@ -249,7 +289,11 @@ fn main() {
                 delete_tag_from_card,
                 update_card_prompt,
                 update_notes_or_solution_content,
-                add_solution
+                add_solution,
+                update_theme,
+                update_hide_difficulty,
+                update_tag_mask,
+                delete_user
             ]
         )
         .run(tauri::generate_context!())

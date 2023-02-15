@@ -244,7 +244,8 @@ pub fn update_deck(
     use schema::Deck;
     let conn = &mut establish_connection(false);
 
-    update(Deck::table.filter(Deck::id.eq(deck_id)))
+    update(Deck::table)
+        .filter(Deck::id.eq(deck_id))
         .set((
             Deck::name.eq(name),
             Deck::size.eq(size),
@@ -512,7 +513,8 @@ pub fn add_card(
                 Card_Deck::deck.eq(deck_id),
             ))
             .execute(conn)?;
-        update(Deck::table.filter(Deck::id.eq(deck_id)))
+        update(Deck::table)
+            .filter(Deck::id.eq(deck_id))
             .set(Deck::size.eq(Deck::size + 1))
             .execute(conn)?;
 
@@ -609,7 +611,8 @@ pub fn update_card_mastery(
     use schema::Card;
     let conn = &mut establish_connection(false);
 
-    update(Card::table.filter(Card::id.eq(card_id)))
+    update(Card::table)
+        .filter(Card::id.eq(card_id))
         .set(Card::mastered.eq(status))
         .execute(conn)?;
 
@@ -740,4 +743,68 @@ pub fn add_solution(
         .execute(conn)?;
 
     Ok(())
+}
+
+pub fn update_theme(user_id: i32, theme: String) -> Result<(), Box<dyn Error>> {
+    use schema::{ ThemeEnum, User };
+    let conn = &mut establish_connection(false);
+
+    let theme_id = ThemeEnum::table.filter(ThemeEnum::name.eq(theme))
+        .select(ThemeEnum::enum_val)
+        .first::<i32>(conn)?;
+    update(User::table)
+        .filter(User::id.eq(user_id))
+        .set(User::theme.eq(theme_id))
+        .execute(conn)?;
+
+    Ok(())
+}
+
+pub fn update_hide_difficulty(
+    user_id: i32,
+    hidediffs: bool
+) -> Result<(), Box<dyn Error>> {
+    use schema::User;
+    let conn = &mut establish_connection(false);
+
+    update(User::table)
+        .filter(User::id.eq(user_id))
+        .set(User::hidediffs.eq(hidediffs))
+        .execute(conn)?;
+
+    Ok(())
+}
+
+pub fn update_tag_mask(
+    user_id: i32,
+    tagmask: i32
+) -> Result<(), Box<dyn Error>> {
+    use schema::User;
+    let conn = &mut establish_connection(false);
+
+    update(User::table)
+        .filter(User::id.eq(user_id))
+        .set(User::tagmask.eq(tagmask))
+        .execute(conn)?;
+
+    Ok(())
+}
+
+pub fn delete_user(user_id: i32) -> Result<(), Box<dyn Error>> {
+    use schema::{ User, Card, Card_Deck };
+    let conn = &mut establish_connection(false);
+
+    conn.transaction(|conn| {
+        delete(User::table.filter(User::id.eq(user_id))).execute(conn)?;
+
+        let cards_in_decks = Card_Deck::table.select(Card_Deck::card)
+            .distinct()
+            .load::<i32>(conn)?;
+
+        delete(Card::table.filter(Card::id.ne_all(cards_in_decks))).execute(
+            conn
+        )?;
+
+        Ok(())
+    })
 }
