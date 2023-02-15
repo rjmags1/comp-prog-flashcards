@@ -5,9 +5,6 @@ import { nextCardId } from "../../helpers"
 import PopupMessage from "../general/PopupMessage"
 import { invoke } from "@tauri-apps/api"
 
-// TODO:
-//    - delete from deck tauri command logic on click
-
 function DeleteCardFromDeckButton() {
     const deckContext = useContext(DeckContext) as DeckLevelContext
     const [renderPopup, setRenderPopup] = useState(false)

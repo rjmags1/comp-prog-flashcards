@@ -12,8 +12,6 @@ import ExitButton from "../general/ExitButton"
 import { DeckContext } from "../../pages/CardsPage"
 import { invoke } from "@tauri-apps/api"
 
-// TODO: tauri command + logic for adding new tag association into db
-
 type TagOption = {
     value: number
     label: string

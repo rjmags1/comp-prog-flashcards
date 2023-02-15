@@ -1,8 +1,5 @@
 import { PopupMessageProps } from "../../types"
 
-// TODO
-// - impl resolution of yes/no questions
-
 function PopupMessage({
     message,
     confirm,
