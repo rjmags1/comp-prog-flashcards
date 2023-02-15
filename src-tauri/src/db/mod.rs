@@ -15,7 +15,7 @@ const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
 const DATABASE_URL: &str = "sqlite://cpf.db";
 
 pub fn run_migrations() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
-    let conn = &mut establish_connection(false);
+    let conn = &mut establish_connection(true);
     conn.run_pending_migrations(MIGRATIONS)?;
 
     Ok(())
