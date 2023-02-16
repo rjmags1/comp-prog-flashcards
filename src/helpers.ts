@@ -1,4 +1,11 @@
 import { CardMetadata } from "./types"
+import {
+    appDataDir,
+    BaseDirectory,
+    join,
+    resolveResource,
+} from "@tauri-apps/api/path"
+import { exists, createDir, copyFile } from "@tauri-apps/api/fs"
 
 export const nextCardId = (
     currCardId: number,
@@ -13,4 +20,25 @@ export const nextCardId = (
     }
 
     return arrCardIds[j]
+}
+
+export const imageDirSetup = async () => {
+    const base = await appDataDir()
+    const defaultAvatarPath = await join(base, "images", "default-avatar.png")
+    if (!(await exists(defaultAvatarPath))) {
+        try {
+            await createDir("images", {
+                dir: BaseDirectory.AppData,
+                recursive: true,
+            })
+            const defaultAvatarResourcePath = await resolveResource(
+                "resources/default-avatar.png"
+            )
+            await copyFile(defaultAvatarResourcePath, defaultAvatarPath, {
+                dir: BaseDirectory.AppData,
+            })
+        } catch (e) {
+            console.error(e)
+        }
+    }
 }

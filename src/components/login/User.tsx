@@ -3,6 +3,7 @@ import { AppContext } from "../../app/App"
 import { useContext, useEffect, useState } from "react"
 import { appDataDir, join } from "@tauri-apps/api/path"
 import { convertFileSrc } from "@tauri-apps/api/tauri"
+import { imageDirSetup } from "../../helpers"
 
 function User_(userInfo: User) {
     const appContext = useContext(AppContext) as AppLevelContext
@@ -19,6 +20,8 @@ function User_(userInfo: User) {
 
     useEffect(() => {
         const imagePathToSrc = async () => {
+            await imageDirSetup()
+
             const { avatarPath } = userInfo
             const base = await appDataDir()
             const path = await join(base, avatarPath)

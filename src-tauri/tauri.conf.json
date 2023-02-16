@@ -17,7 +17,7 @@
         },
         "fs": {
             "all": true,
-            "scope": ["$APPDATA/images/*", "$APPDATA/images"]
+            "scope": ["$APPDATA/images/*", "$APPDATA/images", "$RESOURCE/**/*"]
         },
         "protocol": {
             "all": false,
@@ -40,7 +40,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.tauri.comp-prog-flashcards",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -49,7 +49,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": ["resources/default-avatar.png"],
       "shortDescription": "",
       "targets": "all",
       "windows": {
