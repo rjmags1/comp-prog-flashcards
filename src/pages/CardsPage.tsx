@@ -63,7 +63,7 @@ function CardsPage({ deckId }: CardsPageProps) {
                     ...initialDeckContext,
                     cards,
                     filteredCards,
-                    currentCardId: card_metadata[0].id,
+                    currentCardId: cards.size > 0 ? card_metadata[0].id : null,
                     updater: setDeckContext,
                 }))
                 setDeckName(deck_name)
@@ -83,7 +83,16 @@ function CardsPage({ deckId }: CardsPageProps) {
                 page={Page.Cards}
                 header={`${users.get(currentUser!)?.username} - ${deckName}`}
             />
-            {deckContext.currentCardId && <Deck />}
+            {deckContext.currentCardId === null ? (
+                <div
+                    className="flex h-full w-full items-center justify-center 
+                    text-6xl font-light italic opacity-60"
+                >
+                    Empty deck
+                </div>
+            ) : (
+                <Deck />
+            )}
         </DeckContext.Provider>
     )
 }
