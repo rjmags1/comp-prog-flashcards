@@ -1,4 +1,5 @@
 // @generated automatically by Diesel CLI.
+#![allow(non_snake_case)]
 
 diesel::table! {
     Card (id) {
@@ -146,5 +147,5 @@ diesel::allow_tables_to_appear_in_same_query!(
     Tag,
     TagTypeEnum,
     ThemeEnum,
-    User,
+    User
 );
