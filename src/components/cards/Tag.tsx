@@ -13,7 +13,6 @@ function Tag({ tagData, color, remover, cardData }: TagProps) {
         try {
             await invoke("delete_tag_from_card", { cardId: cardData.id, tagId })
             remover()
-            setRenderPopup(false)
         } catch (e) {
             console.error(e)
         }
@@ -33,6 +32,7 @@ function Tag({ tagData, color, remover, cardData }: TagProps) {
                     whiteText
                     unrender={(d?: boolean) => {
                         if (d) doDelete()
+                        setRenderPopup(false)
                     }}
                 />
             )}

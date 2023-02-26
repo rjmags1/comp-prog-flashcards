@@ -177,7 +177,7 @@ function SettingsForm() {
                     <h5 className="text-xl italic">Hide difficulty:</h5>
                     <input
                         type="checkbox"
-                        className="w-5 outline-none"
+                        className="h-full w-5 outline-none"
                         onChange={(e) => updateHideDifficulty(e.target.checked)}
                     />
                 </div>

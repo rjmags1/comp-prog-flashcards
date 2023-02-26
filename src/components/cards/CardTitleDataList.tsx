@@ -31,8 +31,6 @@ function CardTitleDatalist() {
     const { currentDeck, filteredCards, updater, currentCardId } = deckContext
 
     useEffect(() => {
-        if (allTitles.size > 0) return
-
         const titlesLoader = async () => {
             const titlesTuples: Iterable<readonly [number, string]> =
                 await invoke("load_card_titles", {
@@ -50,7 +48,7 @@ function CardTitleDatalist() {
             : Array.from(filteredCards.keys())
                   .filter(
                       (id) =>
-                          filteredCards.has(id) &&
+                          allTitles.has(id) &&
                           allTitles.get(id)!.indexOf(searchText) > -1
                   )
                   .map((id) => ({

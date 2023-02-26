@@ -33,7 +33,6 @@ function DeleteCardFromDeckButton() {
                 cards: newCards,
                 filteredCards: newFilteredCards,
             })
-            setRenderPopup(false)
         } catch (e) {
             console.error(e)
         }
@@ -45,7 +44,10 @@ function DeleteCardFromDeckButton() {
                 <PopupMessage
                     whiteText
                     message="Remove this card from the current deck?"
-                    unrender={(d?: boolean) => d && doDelete()}
+                    unrender={(d?: boolean) => {
+                        if (d) doDelete()
+                        setRenderPopup(false)
+                    }}
                 />
             )}
             <button

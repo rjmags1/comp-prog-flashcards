@@ -45,7 +45,7 @@ function AddCardModal({ unrender }: AddCardModalProps) {
 
     const addCard = async () => {
         try {
-            const sourceId = source
+            const sourceId = !source
                 ? null
                 : new Map(
                       Array.from(sources.entries()).map(([id, src]) => [
