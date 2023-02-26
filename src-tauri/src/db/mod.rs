@@ -13,6 +13,7 @@ use diesel_migrations::{
 
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
 const DATABASE_URL: &str = "sqlite://cpf.db";
+const NUM_LC_QUESTIONS: i32 = 2547;
 
 pub fn run_migrations() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
     let conn = &mut establish_connection(true);
@@ -174,7 +175,11 @@ pub fn add_user(
 
         if prefill_deck {
             insert_into(Deck::table)
-                .values((Deck::name.eq("Deck 1"), Deck::user.eq(user_id)))
+                .values((
+                    Deck::name.eq("Deck 1"),
+                    Deck::user.eq(user_id),
+                    Deck::size.eq(NUM_LC_QUESTIONS),
+                ))
                 .execute(conn)?;
             let deck_id = Deck::table.select(Deck::id)
                 .order(Deck::id.desc())
