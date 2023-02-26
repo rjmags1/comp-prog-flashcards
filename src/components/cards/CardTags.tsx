@@ -5,6 +5,7 @@ import {
     Tag,
     colors,
     DeckLevelContext,
+    TagMaskLookup,
 } from "../../types"
 import { useContext, useEffect, useState } from "react"
 import Tag_ from "./Tag"
@@ -27,6 +28,9 @@ function CardTags({ cardData }: CardTagsProps) {
             Array.from(cardData.metadata.tags).map((tagId) => tags.get(tagId)!)
         )
     }, [cardData])
+
+    const { currentUser, users } = appContext
+    const { tagMask } = users.get(currentUser!)!
 
     return (
         <div
@@ -54,19 +58,21 @@ function CardTags({ cardData }: CardTagsProps) {
                     setCardTags((prev) => [...prev, ...newTags])
                 }}
             />
-            {cardTags.map((td, i) => (
-                <Tag_
-                    key={td.id}
-                    tagData={td}
-                    cardData={cards.get(currentCardId!)!}
-                    color={shuffledColors[i % colors.length]}
-                    remover={() =>
-                        setCardTags((prev) =>
-                            Array.from(prev).filter((t) => t.id !== td.id)
-                        )
-                    }
-                />
-            ))}
+            {cardTags
+                .filter((td) => (TagMaskLookup.get(td.type)! & tagMask) === 0)
+                .map((td, i) => (
+                    <Tag_
+                        key={td.id}
+                        tagData={td}
+                        cardData={cards.get(currentCardId!)!}
+                        color={shuffledColors[i % colors.length]}
+                        remover={() =>
+                            setCardTags((prev) =>
+                                Array.from(prev).filter((t) => t.id !== td.id)
+                            )
+                        }
+                    />
+                ))}
         </div>
     )
 }

@@ -26,6 +26,11 @@ export enum TagType {
     Concept = "Concept",
     Trick = "Trick",
 }
+export const TagMaskLookup: ReadonlyMap<TagType, number> = new Map([
+    [TagType.Paradigm, 1],
+    [TagType.Concept, 2],
+    [TagType.Trick, 3],
+])
 
 export enum Theme {
     Normal = "Normal",
