@@ -597,7 +597,7 @@ pub fn delete_card_from_deck(
     card_id: i32,
     deck_id: i32
 ) -> Result<i32, Box<dyn Error>> {
-    use schema::{ Card_Deck, Card };
+    use schema::{ Card_Deck, Card, Deck };
     let conn = &mut establish_connection(false);
 
     conn.transaction(|conn| {
@@ -617,6 +617,9 @@ pub fn delete_card_from_deck(
                 )
             ).execute(conn)?;
         }
+        update(Deck::table)
+            .set(Deck::size.eq(Deck::size - 1))
+            .execute(conn)?;
 
         Ok(card_id)
     })
