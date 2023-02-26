@@ -35,10 +35,12 @@ const tagTypeOptions: TagTypeOption[] = [
 ]
 
 function SettingsForm() {
-    const [renderPopup, setRenderPopup] = useState(false)
     const appContext = useContext(AppContext) as AppLevelContext
     const { themes, currentTheme, updater, users, currentUser, pageHistory } =
         appContext
+    const userInfo = users.get(currentUser!)!
+    const [renderPopup, setRenderPopup] = useState(false)
+    const [hideDiffs, setHideDiffs] = useState(userInfo.hideDiffs)
 
     const themeOptions: ThemeOption[] = themes
         .filter((t) => t !== currentTheme)
@@ -47,7 +49,6 @@ function SettingsForm() {
             value: t as string,
         }))
 
-    const userInfo = users.get(currentUser!)!
     const tagMask = userInfo.tagMask
     const hiddenTags: TagTypeOption[] = []
     if (tagMask & 1) hiddenTags.push(tagTypeOptions[0])
@@ -79,7 +80,7 @@ function SettingsForm() {
 
             const updatedUser = {
                 ...userInfo,
-                hidediffs,
+                hideDiffs: hidediffs,
             }
             const newUsers = new Map(users)
             newUsers.set(currentUser!, updatedUser)
@@ -87,6 +88,7 @@ function SettingsForm() {
                 ...appContext,
                 users: newUsers,
             })
+            setHideDiffs(hidediffs)
         } catch (e) {
             console.error(e)
         }
@@ -178,6 +180,7 @@ function SettingsForm() {
                     <input
                         type="checkbox"
                         className="h-full w-5 outline-none"
+                        checked={hideDiffs}
                         onChange={(e) => updateHideDifficulty(e.target.checked)}
                     />
                 </div>

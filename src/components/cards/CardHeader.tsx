@@ -1,10 +1,15 @@
-import { CardHeaderProps } from "../../types"
+import { AppLevelContext, CardHeaderProps } from "../../types"
 import AddCardToDeckButton from "./AddCardToDeckButton"
 import DeleteCardFromDeckButton from "./DeleteCardFromDeckButton"
 import ToggleMasteryButton from "./ToggleMasteryButton"
 import { Tooltip } from "react-tooltip"
+import { AppContext } from "../../app/App"
+import { useContext } from "react"
 
 function CardHeader({ cardData, flipper }: CardHeaderProps) {
+    const { currentUser, users } = useContext(AppContext) as AppLevelContext
+
+    const { hideDiffs } = users.get(currentUser!)!
     return (
         <div
             id="card-header"
@@ -12,7 +17,9 @@ function CardHeader({ cardData, flipper }: CardHeaderProps) {
             gap-x-3 px-6 pt-4 text-black"
         >
             <span className="no-wrap mr-2 w-max text-xl font-extrabold">
-                {cardData.title} - {cardData.metadata.difficulty}
+                {`${cardData.title}${
+                    hideDiffs ? "" : " - " + cardData.metadata.difficulty
+                }`}
             </span>
             <Tooltip anchorId="flip-button" />
             <button
