@@ -568,19 +568,28 @@ pub fn add_card_to_decks(
     card_id: i32,
     deck_ids: Vec<i32>
 ) -> Result<(), Box<dyn Error>> {
-    use schema::Card_Deck;
+    use schema::{ Card_Deck, Deck };
     let conn = &mut establish_connection(false);
 
-    let insert_rows: Vec<_> = deck_ids
-        .into_iter()
-        .map(|deck_id| (
-            Card_Deck::card.eq(card_id),
-            Card_Deck::deck.eq(deck_id),
-        ))
-        .collect();
-    insert_into(Card_Deck::table).values(insert_rows).execute(conn)?;
+    conn.transaction(|conn| {
+        let insert_rows: Vec<_> = deck_ids
+            .iter()
+            .map(|deck_id| (
+                Card_Deck::card.eq(card_id),
+                Card_Deck::deck.eq(deck_id),
+            ))
+            .collect();
+        insert_into(Card_Deck::table).values(insert_rows).execute(conn)?;
 
-    Ok(())
+        for id in deck_ids.iter() {
+            update(Deck::table)
+                .filter(Deck::id.eq(id))
+                .set(Deck::size.eq(Deck::size + 1))
+                .execute(conn)?;
+        }
+
+        Ok(())
+    })
 }
 
 pub fn load_card_decks(card_id: i32) -> Vec<i32> {
