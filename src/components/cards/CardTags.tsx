@@ -17,11 +17,12 @@ const shuffledColors = new Array(...colors).sort(
 
 function CardTags({ cardData }: CardTagsProps) {
     const appContext = useContext(AppContext) as AppLevelContext
-    const { cards, currentCardId } = useContext(DeckContext) as DeckLevelContext
-    const { tags } = appContext
+    const deckContext = useContext(DeckContext) as DeckLevelContext
     const [cardTags, setCardTags] = useState<Tag[]>([])
+    const { cards, currentCardId } = deckContext
 
     useEffect(() => {
+        const { tags } = appContext
         setCardTags(
             Array.from(cardData.metadata.tags).map((tagId) => tags.get(tagId)!)
         )
@@ -35,9 +36,23 @@ function CardTags({ cardData }: CardTagsProps) {
         >
             <AddTagToCardButton
                 cardTags={cardTags}
-                adder={(newTags: Tag[]) =>
+                adder={(newTags: Tag[]) => {
+                    const { updater, cards } = deckContext
+                    const updatedCards = new Map(cards)
+                    const oldCardMetadata = cardData.metadata
+                    updatedCards.set(oldCardMetadata.id, {
+                        ...oldCardMetadata,
+                        tags: new Set([
+                            ...oldCardMetadata.tags,
+                            ...newTags.map((t) => t.id),
+                        ]),
+                    })
+                    updater!({
+                        ...deckContext,
+                        cards: updatedCards,
+                    })
                     setCardTags((prev) => [...prev, ...newTags])
-                }
+                }}
             />
             {cardTags.map((td, i) => (
                 <Tag_

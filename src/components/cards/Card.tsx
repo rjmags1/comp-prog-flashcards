@@ -8,9 +8,7 @@ import CardHeader from "./CardHeader"
 import CardTags from "./CardTags"
 
 function Card_() {
-    const { currentCardId, cards, filteredCards } = useContext(
-        DeckContext
-    ) as DeckLevelContext
+    const { currentCardId, cards } = useContext(DeckContext) as DeckLevelContext
     const [showFront, setShowFront] = useState(true)
     const [cardData, setCardData] = useState<Card | null>(null)
 
