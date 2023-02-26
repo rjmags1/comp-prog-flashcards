@@ -77,13 +77,15 @@ function CardsPage({ deckId }: CardsPageProps) {
         }
     })
 
+    console.log(deckContext.currentCardId)
+
     return (
         <DeckContext.Provider value={deckContext}>
             <PageHeader
                 page={Page.Cards}
                 header={`${users.get(currentUser!)?.username} - ${deckName}`}
             />
-            {deckContext.currentCardId === null ? (
+            {!deckContext.currentCardId ? (
                 <div
                     className="flex h-full w-full items-center justify-center 
                     text-6xl font-light italic opacity-60"

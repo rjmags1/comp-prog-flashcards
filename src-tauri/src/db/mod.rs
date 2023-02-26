@@ -627,6 +627,7 @@ pub fn delete_card_from_deck(
             ).execute(conn)?;
         }
         update(Deck::table)
+            .filter(Deck::id.eq(deck_id))
             .set(Deck::size.eq(Deck::size - 1))
             .execute(conn)?;
 

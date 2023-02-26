@@ -29,7 +29,10 @@ function DeleteCardFromDeckButton() {
             newFilteredCards.delete(deletedId)
             updater!({
                 ...deckContext,
-                currentCardId: nextCardId(deletedId, filteredCards, 1),
+                currentCardId:
+                    newCards.size === 0
+                        ? null
+                        : nextCardId(deletedId, filteredCards, 1),
                 cards: newCards,
                 filteredCards: newFilteredCards,
             })
