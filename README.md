@@ -6,6 +6,9 @@
 
 __See docs folder for design and implementation documentation__
 
+## Video demo
+https://youtu.be/BzqOccz9YqA
+
 ### Run the dev build
 - Clone and go to project root:
 ```
