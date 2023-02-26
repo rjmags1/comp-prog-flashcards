@@ -52,7 +52,11 @@ function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
     const handleAdd = async () => {
         try {
             const deckIds = selectedDecks.map((d) => d.value)
-            await invoke("add_card_to_deck", { cardId: currentCardId, deckIds })
+            await invoke("add_card_to_decks", {
+                cardId: currentCardId,
+                deckIds,
+            })
+            unrender()
         } catch (e) {
             console.error(e)
         }
