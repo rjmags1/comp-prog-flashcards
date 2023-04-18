@@ -38,6 +38,7 @@ function CardFront({ cardData }: CardFrontProps) {
             className="no-scrollbar relative mx-2 overflow-y-scroll 
                 rounded-md border border-black"
             style={{ height: Number.isNaN(cardFrontSize) ? "" : cardFrontSize }}
+            id="md-editor-front"
         >
             <MarkdownEditor
                 value={prompt}

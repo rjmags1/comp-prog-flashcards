@@ -147,6 +147,7 @@ function CardBack({ cardData }: CardBackProps) {
                     style={{
                         height: Number.isNaN(cardBackSize) ? "" : cardBackSize,
                     }}
+                    id="md-editor-front"
                 >
                     <MarkdownEditor
                         value={tabContent}

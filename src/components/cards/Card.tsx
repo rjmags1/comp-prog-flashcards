@@ -38,6 +38,23 @@ function Card_() {
         cardLoader()
     }, [currentCardId])
 
+    useEffect(() => {
+        const handler = (e: KeyboardEvent) => {
+            if (
+                e.key === " " &&
+                !(
+                    document.getElementById("md-editor-front") ||
+                    document.getElementById("md-editor-back")
+                )
+            ) {
+                setShowFront((prev) => !prev)
+            }
+        }
+        document.addEventListener("keyup", handler)
+
+        return () => document.removeEventListener("keyup", handler)
+    }, [])
+
     return (
         <div
             id="card"
