@@ -77,8 +77,6 @@ function CardsPage({ deckId }: CardsPageProps) {
         }
     })
 
-    console.log(deckContext.currentCardId)
-
     return (
         <DeckContext.Provider value={deckContext}>
             <PageHeader

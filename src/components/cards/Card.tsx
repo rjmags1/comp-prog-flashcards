@@ -6,6 +6,7 @@ import CardBack from "./CardBack"
 import CardFront from "./CardFront"
 import CardHeader from "./CardHeader"
 import CardTags from "./CardTags"
+import { editingCard } from "../../helpers"
 
 function Card_() {
     const { currentCardId, cards } = useContext(DeckContext) as DeckLevelContext
@@ -40,13 +41,7 @@ function Card_() {
 
     useEffect(() => {
         const handler = (e: KeyboardEvent) => {
-            if (
-                e.key === " " &&
-                !(
-                    document.getElementById("md-editor-front") ||
-                    document.getElementById("md-editor-back")
-                )
-            ) {
+            if (e.key === " " && !editingCard()) {
                 setShowFront((prev) => !prev)
             }
         }

@@ -42,3 +42,7 @@ export const imageDirSetup = async () => {
         }
     }
 }
+
+export const editingCard = () =>
+    (document.getElementById("md-editor-front") ||
+        document.getElementById("md-editor-back")) !== null
