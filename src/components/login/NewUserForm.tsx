@@ -97,13 +97,15 @@ function NewUserForm({ unrender }: NewUserFormProps) {
 
     return (
         <div
-            className="absolute z-10 flex
-            h-fit w-fit flex-col gap-y-5 rounded-lg border border-white 
+            className="absolute z-10 flex w-fit flex-col 
+            items-start justify-center gap-y-5 rounded-lg border border-white 
             bg-stone-800 p-10 drop-shadow-2xl"
         >
-            <div className="flex items-center justify-between pb-4">
+            <div className="flex w-full justify-between">
                 <h2 className="text-4xl font-bold">New User</h2>
-                <ExitButton exitCallback={unrender} />
+                <div className="-mt-1">
+                    <ExitButton exitCallback={unrender} />
+                </div>
             </div>
             <div className="flex gap-x-2">
                 Username:
@@ -124,9 +126,10 @@ function NewUserForm({ unrender }: NewUserFormProps) {
                     }
                 />
             </div>
-            <div className="flex gap-x-3">
+            <div className="flex items-center gap-x-3">
                 Prefill a deck with Leetcode questions?
                 <input
+                    className="hover:cursor-pointer"
                     type="checkbox"
                     checked={prefillDeck}
                     onChange={(e) => setPrefillDeck(e.target.checked)}
