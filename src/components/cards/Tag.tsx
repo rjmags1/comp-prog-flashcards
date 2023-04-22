@@ -44,7 +44,10 @@ function Tag({ tagData, color, remover, cardData }: TagProps) {
                 />
             )}
             <span className="h-full truncate align-middle">{tagData.name}</span>
+            <Tooltip anchorId={`remove-tag-button-${tagData.id}`} />
             <button
+                id={`remove-tag-button-${tagData.id}`}
+                data-tooltip-content="Remove tag from card"
                 onClick={() => setRenderPopup(true)}
                 className="pb-[2px] text-base hover:opacity-50"
             >

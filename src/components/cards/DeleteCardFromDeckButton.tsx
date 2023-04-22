@@ -4,6 +4,7 @@ import { DeckLevelContext } from "../../types"
 import { nextCardId } from "../../helpers"
 import PopupMessage from "../general/PopupMessage"
 import { invoke } from "@tauri-apps/api"
+import { Tooltip } from "react-tooltip"
 
 function DeleteCardFromDeckButton() {
     const deckContext = useContext(DeckContext) as DeckLevelContext
@@ -53,7 +54,10 @@ function DeleteCardFromDeckButton() {
                     }}
                 />
             )}
+            <Tooltip anchorId="remove-from-deck-button" />
             <button
+                id="remove-from-deck-button"
+                data-tooltip-content="Remove card from this deck"
                 title="Delete card from deck"
                 className="text-lg hover:opacity-50"
                 onClick={() => setRenderPopup(true)}

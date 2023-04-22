@@ -24,7 +24,7 @@ function CardHeader({ cardData, flipper }: CardHeaderProps) {
             <Tooltip anchorId="flip-button" />
             <button
                 onClick={flipper}
-                data-tooltip-content="Click or type spacebar to flip"
+                data-tooltip-content="Click or type spacebar to flip card"
                 id="flip-button"
                 className="h-fit rounded-md border border-black 
                 bg-slate-800 px-2 pb-1 text-xl leading-6 text-white 

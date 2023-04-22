@@ -2,6 +2,7 @@ import { useContext } from "react"
 import { DeckContext } from "../../pages/CardsPage"
 import { invoke } from "@tauri-apps/api"
 import { DeckLevelContext } from "../../types"
+import { Tooltip } from "react-tooltip"
 
 function ToggleMasteryButton() {
     const deckContext = useContext(DeckContext) as DeckLevelContext
@@ -36,10 +37,12 @@ function ToggleMasteryButton() {
     return (
         <button
             onClick={toggler}
-            title={`${cardData.mastered ? "Unmark" : "Mark"} as mastered`}
             className="flex h-full items-center justify-center"
         >
+            <Tooltip anchorId="toggle-mastered-box" />
             <div
+                id="toggle-mastered-box"
+                data-tooltip-content="Mark/unmark card as mastered"
                 className="h-[25px] w-[25px] rounded border-2 border-black 
                 text-green-600 hover:border-gray-400"
             >
