@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api"
 import { useContext, useState } from "react"
 import Select from "react-select"
 import { AppContext } from "../../app/App"
-import { AppLevelContext, Page, TagType, Theme, ThemeLookup } from "../../types"
+import { AppLevelContext, Page, TagType, ThemeLookup } from "../../types"
 import PopupMessage from "../general/PopupMessage"
 
 type ThemeOption = {
@@ -179,7 +179,7 @@ function SettingsForm() {
                     <h5 className="text-xl italic">Hide difficulty:</h5>
                     <input
                         type="checkbox"
-                        className="h-full w-5 outline-none"
+                        className="h-full w-5 outline-none hover:cursor-pointer"
                         checked={hideDiffs}
                         onChange={(e) => updateHideDifficulty(e.target.checked)}
                     />
