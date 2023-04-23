@@ -66,7 +66,7 @@ function TagFilter({ tagType }: TagFilterProps) {
                     currentCardId:
                         newFilteredCardsArr.length > 0
                             ? newFilteredCardsArr[0][0]
-                            : -1,
+                            : null,
                 })
             }}
             closeMenuOnSelect={false}

@@ -36,7 +36,7 @@ function Card_() {
             }
         }
 
-        cardLoader()
+        currentCardId && cardLoader()
     }, [currentCardId])
 
     useEffect(() => {
@@ -55,7 +55,7 @@ function Card_() {
             id="card"
             className="flex h-full w-[80%] basis-full flex-col rounded-md bg-white"
         >
-            {!cardData ? null : (
+            {cardData && (
                 <>
                     <CardHeader
                         cardData={cardData}
