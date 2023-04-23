@@ -144,13 +144,13 @@ export interface PageHeaderProps {
 export interface ModalProps {
     children: ReactNode
     whiteText?: boolean
-    widthVw: number
-    heightVh: number
+    width?: number
+    height?: number
 }
 
 export interface AddToDeckModalProps {
-    widthVw: number
-    heightVh: number
+    width?: number
+    height?: number
     unrender: () => void
 }
 

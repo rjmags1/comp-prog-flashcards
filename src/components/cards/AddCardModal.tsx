@@ -13,6 +13,7 @@ import Select from "react-select"
 import { AppContext } from "../../app/App"
 import { invoke } from "@tauri-apps/api"
 import { DeckContext } from "../../pages/CardsPage"
+import ExitButton from "../general/ExitButton"
 
 type DifficultyOption = {
     label: string
@@ -103,15 +104,11 @@ function AddCardModal({ unrender }: AddCardModalProps) {
     }
 
     return (
-        <Modal widthVw={60} heightVh={70}>
-            <span
-                className="absolute top-6 right-12 w-[80%] text-right 
-                    text-5xl font-thin hover:cursor-pointer hover:opacity-50"
-                onClick={() => unrender()}
-            >
-                ×
-            </span>
-            <div className="flex w-[70%] flex-col">
+        <Modal width={640} height={480}>
+            <div className="-mt-[16px] flex w-[80%] flex-col">
+                <span className="flex w-full justify-end">
+                    <ExitButton exitCallback={unrender} />
+                </span>
                 <h3 className="mb-8 text-4xl italic">Add New Card</h3>
                 <h5>Title:</h5>
                 <input

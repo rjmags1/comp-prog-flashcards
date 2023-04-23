@@ -42,7 +42,7 @@ function AddTagsModal({ cardTags, unrender, adder }: AddTagsModalProps) {
     }
 
     return (
-        <Modal widthVw={70} heightVh={80}>
+        <Modal width={680} height={640}>
             <div className="-mt-4 mb-4 flex w-full justify-end pr-8">
                 <ExitButton exitCallback={unrender} />
             </div>

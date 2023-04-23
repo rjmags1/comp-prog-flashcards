@@ -8,11 +8,7 @@ function AddCardToDeckButton() {
     return (
         <>
             {renderModal && (
-                <AddToDeckModal
-                    widthVw={60}
-                    heightVh={70}
-                    unrender={() => setRenderModal(false)}
-                />
+                <AddToDeckModal unrender={() => setRenderModal(false)} />
             )}
             <Tooltip anchorId="add-deck-button" />
             <button

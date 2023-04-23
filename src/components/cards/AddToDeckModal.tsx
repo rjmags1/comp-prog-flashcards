@@ -17,7 +17,7 @@ type DeckOption = {
     label: string
 }
 
-function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
+function AddToDeckModal({ unrender }: AddToDeckModalProps) {
     const { currentUser, users } = useContext(AppContext) as AppLevelContext
     const { currentDeck, currentCardId } = useContext(
         DeckContext
@@ -63,7 +63,7 @@ function AddToDeckModal({ widthVw, heightVh, unrender }: AddToDeckModalProps) {
     }
 
     return (
-        <Modal widthVw={widthVw} heightVh={heightVh}>
+        <Modal>
             <div
                 className="relative flex h-full w-full flex-col 
                 items-center justify-start gap-y-5 overflow-hidden text-white"
