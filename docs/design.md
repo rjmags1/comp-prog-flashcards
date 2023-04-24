@@ -810,15 +810,20 @@ SELECT * FROM TagTypeEnum;
     - For certain commands just do a direct translation into diesel method calls, for others use query wrapper that call multiple separate diesel queries. 
 - **[ ✅ ]** The app should be a fully (untested) functional MVP after this phase.
 
-### Phase 4
-- Clean up the UI
+### [ ✅ ] Phase 4
+- **[ ✅ ]** Clean up the UI
   - Make sure styles are completely consistent
   - Implement hotkeys for certain actions (spacebar for card flip, arrow keys for scroll to next/prev card) 
-- Add tooltips where needed (hotkeys, hover descriptions, etc.)
-- Handle large filter tag lists (i.e. 5 selected paradigm tags)
+- **[ ✅ ]** Add tooltips where needed (hotkeys, hover descriptions, etc.)
+- **[ ✅ ]** Handle large filter tag lists (i.e. 5 selected paradigm tags)
 
 ### Phase 5
-- Test all above functionality annotated as needing it
+- Test, refactor as go
+    - Rust db fetchers
+    - Tauri commands
+    - Important pieces of UI
+    - Playwright?
+- Final code review
 
 ### Phase 6
 - other ideas?
