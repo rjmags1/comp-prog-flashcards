@@ -3,6 +3,12 @@ import { AppContext } from "../../app/App"
 import { useContext, useState } from "react"
 import { invoke } from "@tauri-apps/api"
 import PopupMessage from "../general/PopupMessage"
+import Select from "react-select"
+
+type TagTypeOption = {
+    value: string
+    label: string
+}
 
 function NewTagForm() {
     const appContext = useContext(AppContext) as AppLevelContext
@@ -37,6 +43,12 @@ function NewTagForm() {
         }
     }
 
+    const options: TagTypeOption[] = [
+        { value: TagType.Paradigm, label: TagType.Paradigm },
+        { value: TagType.Concept, label: TagType.Concept },
+        { value: TagType.Trick, label: TagType.Trick },
+    ]
+
     return (
         <div className="flex w-full flex-col items-start justify-center gap-y-2">
             {addFailError && (
@@ -48,22 +60,34 @@ function NewTagForm() {
                 />
             )}
             Type:
-            <select
+            <Select
+                name="tag-types"
+                onChange={(added) => setType(added as TagType)}
                 value={type}
-                onChange={(e) => setType(e.target.value as TagType)}
-                className="rounded-md bg-white py-1 px-2 text-black"
-            >
-                <option value={TagType.Paradigm}>{TagType.Paradigm}</option>
-                <option value={TagType.Concept}>{TagType.Concept}</option>
-                <option value={TagType.Trick}>{TagType.Trick}</option>
-            </select>
+                placeholder="Select tag type"
+                options={options as any}
+                className="w-full text-left text-black"
+                isClearable={false}
+                closeMenuOnSelect={false}
+                styles={{
+                    control: (baseStyles, state) => ({
+                        display: "flex",
+                        backgroundColor: "white",
+                        borderRadius: ".375rem",
+                    }),
+                    input: (baseStyles, state) => ({
+                        ...baseStyles,
+                        outline: "none",
+                    }),
+                }}
+            />
             Name:
             <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter new name..."
-                className="w-[60%] rounded-md py-1 px-2 text-black outline-none"
+                className="w-full rounded-md py-1 px-2 text-black outline-none"
             />
             Content (extra info displayed in tag tooltips):
             <input
