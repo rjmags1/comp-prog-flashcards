@@ -839,3 +839,6 @@ pub fn delete_user(user_id: i32) -> Result<(), Box<dyn Error>> {
         Ok(())
     })
 }
+
+#[cfg(test)]
+mod test;
