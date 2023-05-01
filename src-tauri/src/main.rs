@@ -8,7 +8,7 @@ use app::database;
 
 #[tauri::command]
 fn load_app_context() -> database::AppContextDbData {
-    database::load_app_context()
+    database::load_app_context(None)
 }
 
 #[tauri::command]

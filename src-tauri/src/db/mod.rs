@@ -37,7 +37,7 @@ pub fn establish_connection(disable_fk: bool) -> SqliteConnection {
 }
 
 #[derive(serde::Serialize)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct UserData {
     pub id: i32,
     pub username: String,
@@ -75,9 +75,12 @@ type UserInfoRow = (i32, String, i32, bool, Option<String>, Option<String>);
 type TagRow = (i32, String, Option<String>, Option<String>);
 type SourceRow = (i32, String);
 
-pub fn load_app_context() -> AppContextDbData {
+pub fn load_app_context(preconn: Option<SqliteConnection>) -> AppContextDbData {
     use schema::{ ThemeEnum, User, Image, Tag, TagTypeEnum, Source };
-    let conn = &mut establish_connection(false);
+    let conn = &mut (match preconn {
+        Some(c) => c,
+        None => establish_connection(false),
+    });
 
     let theme_rows = ThemeEnum::table.load::<ThemeEnumRow>(conn).unwrap();
     let user_rows = User::table.left_join(Image::table)
