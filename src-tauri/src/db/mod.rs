@@ -48,7 +48,7 @@ pub struct UserData {
 }
 
 #[derive(serde::Serialize)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct TagData {
     pub id: i32,
     pub tag_type: String,
@@ -65,6 +65,7 @@ pub struct AppContextDbData {
 }
 
 #[derive(serde::Serialize)]
+#[derive(Debug, PartialEq)]
 pub struct SourceData {
     pub id: i32,
     pub name: String,

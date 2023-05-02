@@ -104,10 +104,6 @@ fn insert_test_source(
 
 #[test]
 fn test_load_app_context() {
-    // should load all user ids, names, tagmasks, hidediffs, avatar_path, their theme names
-    // should load all tag ids, type names, names, content
-    // should load all theme names
-    // should load all source id and names
     let mut conn = init_test_db().unwrap();
     let test_image_path_1 = "test_path_1".to_string();
     let test_image_path_2 = "test_path_2".to_string();
@@ -122,23 +118,34 @@ fn test_load_app_context() {
         test_image_path_2.clone()
     ).unwrap();
 
-    let test_tag_name_1 = "test_tag_1".to_string();
-    let test_tag_name_2 = "test_tag_2".to_string();
-    let test_tag_type_1 = PreDefTagType::Concept;
-    let test_tag_type_2 = PreDefTagType::Paradigm;
-    let test_tag_content_1 = Some("test content".to_string());
-    let test_tag_content_2: Option<String> = None;
+    let test_tag_data_1 = TagData {
+        id: 1,
+        tag_type: PRE_DEF_TAG_TYPE_NAMES[
+            (PreDefTagType::Paradigm as usize) - 1
+        ].to_string(),
+        name: "test_tag_1".to_string(),
+        content: Some("test content".to_string()),
+    };
+    let test_tag_data_2 = TagData {
+        id: 2,
+        tag_type: PRE_DEF_TAG_TYPE_NAMES[
+            (PreDefTagType::Concept as usize) - 1
+        ].to_string(),
+        name: "test_tag_2".to_string(),
+        content: None,
+    };
+
     insert_test_tag(
         &mut conn,
-        test_tag_type_1,
-        test_tag_name_1,
-        test_tag_content_1
+        PreDefTagType::Paradigm,
+        test_tag_data_1.name.clone(),
+        test_tag_data_1.content.clone()
     ).unwrap();
     insert_test_tag(
         &mut conn,
-        test_tag_type_2,
-        test_tag_name_2,
-        test_tag_content_2
+        PreDefTagType::Concept,
+        test_tag_data_2.name.clone(),
+        test_tag_data_2.content.clone()
     ).unwrap();
 
     let test_user_data_1 = UserData {
@@ -178,8 +185,16 @@ fn test_load_app_context() {
         false
     ).unwrap();
 
-    let test_source_name_1 = "test_source_1".to_string();
-    insert_test_source(&mut conn, test_source_name_1).unwrap();
+    let test_source_data_1 = SourceData {
+        id: 1,
+        name: "test_source_1".to_string(),
+    };
+    let test_source_data_2 = SourceData {
+        id: 2,
+        name: "test_source_2".to_string(),
+    };
+    insert_test_source(&mut conn, test_source_data_1.name.clone()).unwrap();
+    insert_test_source(&mut conn, test_source_data_2.name.clone()).unwrap();
 
     let test_app_context_data = load_app_context(Some(conn));
     assert_eq!(test_app_context_data.themes, PRE_DEF_THEME_TYPE_NAMES.to_vec());
@@ -187,18 +202,26 @@ fn test_load_app_context() {
         test_app_context_data.users,
         vec![test_user_data_1, test_user_data_2]
     );
+    assert_eq!(
+        test_app_context_data.tags,
+        vec![test_tag_data_1, test_tag_data_2]
+    );
+    assert_eq!(
+        test_app_context_data.sources,
+        vec![test_source_data_1, test_source_data_2]
+    );
 }
 
-#[test]
-fn test_add_user() {
-    // decide on how to prefill cards - probably easiest use lc migration
+//#[test]
+//fn test_add_user() {
+//// decide on how to prefill cards - probably easiest use lc migration
 
-    // get test db connection
-    // insert test user, avatars
+//// get test db connection
+//// insert test user, avatars
 
-    // assert on inserted user data
-    // assert on default theme(normal), tagmask(0), hidediffs(false)
-    // assert on insertion and non-insertion of prefill deck
+//// assert on inserted user data
+//// assert on default theme(normal), tagmask(0), hidediffs(false)
+//// assert on insertion and non-insertion of prefill deck
 
-    todo!();
-}
+//todo!();
+//}
