@@ -143,13 +143,13 @@ pub fn load_app_context(preconn: Option<SqliteConnection>) -> AppContextDbData {
 }
 
 pub fn add_user(
+    conn: &mut SqliteConnection,
     username: String,
     default_avatar: bool,
     avatar_path: String,
     avatar_name: String,
     prefill_deck: bool
 ) -> Result<UserData, Box<dyn Error>> {
-    let conn = &mut establish_connection(false);
     use schema::{ User, Deck, Image, Card, Card_Deck };
 
     conn.transaction(|conn| {

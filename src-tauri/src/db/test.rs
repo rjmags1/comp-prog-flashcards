@@ -1,5 +1,5 @@
 use super::*;
-use diesel::sqlite::SqliteConnection;
+use diesel::sqlite::{ SqliteConnection };
 use diesel_migrations::{ embed_migrations, FileBasedMigrations };
 use crate::schema;
 
@@ -14,6 +14,8 @@ const TEST_EMBEDDED_MIGRATIONS: EmbeddedMigrations = embed_migrations!(
 );
 const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
     "./src/db/test_migrations/file_based/deck_prefill";
+const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
+const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
 
 enum PreDefTagType {
     Paradigm = 1,
@@ -21,14 +23,10 @@ enum PreDefTagType {
     Trick = 3,
 }
 
-const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
-
 enum PreDefThemeType {
     Normal = 1,
     Dark = 2,
 }
-
-const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
 
 fn init_test_db() -> Result<
     SqliteConnection,
@@ -226,17 +224,82 @@ fn insert_test_preshipped_lc_deck(
 
 #[test]
 fn test_add_user() {
-    // get test db connection
-    use schema::Card;
+    use schema::User;
     let conn = init_test_db().unwrap();
     let mut conn = insert_test_preshipped_lc_deck(conn).unwrap();
-    let t = Card::table.select(Card::id).load::<i32>(&mut conn).unwrap();
-    assert_eq!(t.len(), 10);
-
-    todo!();
     // insert test user, avatars
+    let test_image_name_1 = "test_image_1".to_string();
+    let test_image_name_2 = "test_image_2".to_string();
+    let test_image_path_1 = "test_path_1".to_string();
+    let test_image_path_2 = "test_path_2".to_string();
+    insert_test_image(
+        &mut conn,
+        test_image_name_1.clone(),
+        test_image_path_1.clone()
+    ).unwrap();
 
-    // assert on inserted user data
+    let test_user_data_1 = UserData {
+        id: 1,
+        username: "test_user_1".to_string(),
+        avatar_path: test_image_path_1.clone(),
+        theme: PRE_DEF_THEME_TYPE_NAMES[
+            (PreDefThemeType::Normal as usize) - 1
+        ].to_string(),
+        tagmask: 0,
+        hidediffs: true,
+    };
+    let test_user_data_2 = UserData {
+        id: 2,
+        username: "test_user_2".to_string(),
+        avatar_path: test_image_path_2.clone(),
+        theme: PRE_DEF_THEME_TYPE_NAMES[
+            (PreDefThemeType::Dark as usize) - 1
+        ].to_string(),
+        tagmask: 2,
+        hidediffs: false,
+    };
+
+    add_user(
+        &mut conn,
+        test_user_data_1.username.clone(),
+        false,
+        test_image_path_2.clone(),
+        test_image_name_2.clone(),
+        false
+    ).unwrap();
+    add_user(
+        &mut conn,
+        test_user_data_2.username.clone(),
+        true,
+        test_image_path_1.clone(),
+        test_image_name_1.clone(),
+        true
+    ).unwrap();
+    let users = User::table.select((
+        User::username,
+        User::avatar.nullable(),
+        User::theme,
+        User::tagmask,
+        User::hidediffs,
+    ))
+        .load::<(String, Option<i32>, i32, i32, bool)>(&mut conn)
+        .unwrap();
+    let added_row_1 = &users[0];
+    let added_row_2 = &users[1];
+
+    assert_eq!(added_row_1.0, test_user_data_1.username);
+    assert_eq!(added_row_1.1.unwrap(), 2);
+    assert_eq!(added_row_1.2, 1);
+    assert_eq!(added_row_1.3, 0);
+    assert_eq!(added_row_1.4, false);
+
+    assert_eq!(added_row_2.0, test_user_data_2.username);
+    assert_eq!(added_row_2.1, None);
+    assert_eq!(added_row_2.2, 1);
+    assert_eq!(added_row_2.3, 0);
+    assert_eq!(added_row_2.4, false);
+    //todo!();
+
     // assert on default theme(normal), tagmask(0), hidediffs(false)
     // assert on insertion and non-insertion of prefill deck
 }

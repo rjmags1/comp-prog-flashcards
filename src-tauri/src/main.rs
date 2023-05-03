@@ -20,6 +20,7 @@ fn add_user(
     prefill_deck: bool
 ) -> Result<database::UserData, String> {
     let add_result = database::add_user(
+        &mut database::establish_connection(false),
         username,
         default_avatar,
         avatar_path,

@@ -1,7 +1,5 @@
 INSERT INTO Source (name) VALUES ("Leetcode");
 
-INSERT INTO User (username) VALUES ("dev");
-
 INSERT INTO Deck (name, user) VALUES ("devDeck", 1);
 
 UPDATE Deck SET size = 2547 WHERE id = 1;
