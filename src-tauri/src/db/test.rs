@@ -1,6 +1,6 @@
 use super::*;
 use diesel::sqlite::SqliteConnection;
-use diesel_migrations::{ embed_migrations, EmbeddedMigrations };
+use diesel_migrations::{ embed_migrations, FileBasedMigrations };
 use crate::schema;
 
 // general plan
@@ -9,9 +9,11 @@ use crate::schema;
 //   - test db fetchers using mock data
 
 const TEST_DB_URL: &str = ":memory:";
-const TEST_MIGRATIONS: EmbeddedMigrations = embed_migrations!(
-    "./src/db/test_migrations"
+const TEST_EMBEDDED_MIGRATIONS: EmbeddedMigrations = embed_migrations!(
+    "./src/db/test_migrations/embedded"
 );
+const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
+    "./src/db/test_migrations/file_based/deck_prefill";
 
 enum PreDefTagType {
     Paradigm = 1,
@@ -33,7 +35,7 @@ fn init_test_db() -> Result<
     Box<dyn Error + Send + Sync + 'static>
 > {
     let mut conn = SqliteConnection::establish(TEST_DB_URL)?; // in memory sqlite db
-    conn.run_pending_migrations(TEST_MIGRATIONS)?; // just define empty entities
+    conn.run_pending_migrations(TEST_EMBEDDED_MIGRATIONS)?; // just define empty entities
     let conn = conn;
     Ok(conn)
 }
@@ -212,16 +214,29 @@ fn test_load_app_context() {
     );
 }
 
-//#[test]
-//fn test_add_user() {
-//// decide on how to prefill cards - probably easiest use lc migration
+fn insert_test_preshipped_lc_deck(
+    mut conn: SqliteConnection
+) -> Result<SqliteConnection, Box<dyn Error + Send + Sync>> {
+    let m = FileBasedMigrations::from_path(
+        TEST_DECK_PREFILL_MIGRATION_PATH
+    ).unwrap();
+    conn.run_pending_migrations(m).unwrap();
+    Ok(conn)
+}
 
-//// get test db connection
-//// insert test user, avatars
+#[test]
+fn test_add_user() {
+    // get test db connection
+    use schema::Card;
+    let conn = init_test_db().unwrap();
+    let mut conn = insert_test_preshipped_lc_deck(conn).unwrap();
+    let t = Card::table.select(Card::id).load::<i32>(&mut conn).unwrap();
+    assert_eq!(t.len(), 10);
 
-//// assert on inserted user data
-//// assert on default theme(normal), tagmask(0), hidediffs(false)
-//// assert on insertion and non-insertion of prefill deck
+    todo!();
+    // insert test user, avatars
 
-//todo!();
-//}
+    // assert on inserted user data
+    // assert on default theme(normal), tagmask(0), hidediffs(false)
+    // assert on insertion and non-insertion of prefill deck
+}
