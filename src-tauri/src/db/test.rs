@@ -1,5 +1,5 @@
 use super::*;
-use diesel::sqlite::{ SqliteConnection };
+use diesel::{ sqlite::{ SqliteConnection }, dsl::count_star };
 use diesel_migrations::{ embed_migrations, FileBasedMigrations };
 use crate::schema;
 
@@ -16,6 +16,10 @@ const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
     "./src/db/test_migrations/file_based/deck_prefill";
 const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
 const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
+const DEFAULT_IMAGE_NAME: &str = "default";
+const DEFAULT_IMAGE_PATH: &str = "images/default-avatar.png";
+const TEST_PREFILL_DECK_NAME: &str = "Deck 1";
+const TEST_PREFILL_DECK_SIZE: i32 = 2547;
 
 enum PreDefTagType {
     Paradigm = 1,
@@ -50,6 +54,12 @@ fn insert_test_image(
     Ok(())
 }
 
+fn wipe_test_images(conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    use schema::Image;
+    delete(Image::table).filter(Image::id.gt(1)).execute(conn)?;
+    Ok(())
+}
+
 fn insert_test_tag(
     conn: &mut SqliteConnection,
     tag_type: PreDefTagType,
@@ -69,6 +79,12 @@ fn insert_test_tag(
             Tag::content.eq(content),
         ))
         .execute(conn)?;
+    Ok(())
+}
+
+fn wipe_test_tags(conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    use schema::Tag;
+    delete(Tag::table).execute(conn)?;
     Ok(())
 }
 
@@ -93,6 +109,12 @@ fn insert_test_user(
     Ok(())
 }
 
+fn wipe_test_users(conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    use schema::User;
+    delete(User::table).execute(conn)?;
+    Ok(())
+}
+
 fn insert_test_source(
     conn: &mut SqliteConnection,
     name: String
@@ -102,9 +124,26 @@ fn insert_test_source(
     Ok(())
 }
 
+fn wipe_test_sources(
+    conn: &mut SqliteConnection
+) -> Result<(), Box<dyn Error>> {
+    use schema::Source;
+    delete(Source::table).execute(conn)?;
+    Ok(())
+}
+
+fn wipe_test_data(conn: &mut SqliteConnection) -> Result<(), Box<dyn Error>> {
+    wipe_test_images(conn)?;
+    wipe_test_tags(conn)?;
+    wipe_test_users(conn)?;
+    wipe_test_sources(conn)?;
+    Ok(())
+}
+
 #[test]
 fn test_load_app_context() {
     let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
     let test_image_path_1 = "test_path_1".to_string();
     let test_image_path_2 = "test_path_2".to_string();
     insert_test_image(
@@ -224,19 +263,12 @@ fn insert_test_preshipped_lc_deck(
 
 #[test]
 fn test_add_user() {
-    use schema::User;
-    let conn = init_test_db().unwrap();
+    use schema::{ User, Deck };
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
     let mut conn = insert_test_preshipped_lc_deck(conn).unwrap();
-    // insert test user, avatars
     let test_image_name_1 = "test_image_1".to_string();
-    let test_image_name_2 = "test_image_2".to_string();
     let test_image_path_1 = "test_path_1".to_string();
-    let test_image_path_2 = "test_path_2".to_string();
-    insert_test_image(
-        &mut conn,
-        test_image_name_1.clone(),
-        test_image_path_1.clone()
-    ).unwrap();
 
     let test_user_data_1 = UserData {
         id: 1,
@@ -246,33 +278,42 @@ fn test_add_user() {
             (PreDefThemeType::Normal as usize) - 1
         ].to_string(),
         tagmask: 0,
-        hidediffs: true,
+        hidediffs: false,
     };
     let test_user_data_2 = UserData {
         id: 2,
         username: "test_user_2".to_string(),
-        avatar_path: test_image_path_2.clone(),
+        avatar_path: DEFAULT_IMAGE_PATH.to_string(),
         theme: PRE_DEF_THEME_TYPE_NAMES[
-            (PreDefThemeType::Dark as usize) - 1
+            (PreDefThemeType::Normal as usize) - 1
         ].to_string(),
-        tagmask: 2,
+        tagmask: 0,
         hidediffs: false,
     };
 
-    add_user(
+    let initial_decks = Deck::table.select((
+        Deck::name,
+        Deck::user,
+        Deck::size,
+        Deck::mastered,
+    ))
+        .load::<(String, i32, i32, i32)>(&mut conn)
+        .unwrap();
+
+    let ret_1 = add_user(
         &mut conn,
         test_user_data_1.username.clone(),
         false,
-        test_image_path_2.clone(),
-        test_image_name_2.clone(),
+        test_image_path_1.clone(),
+        test_image_name_1.clone(),
         false
     ).unwrap();
-    add_user(
+    let ret_2 = add_user(
         &mut conn,
         test_user_data_2.username.clone(),
         true,
-        test_image_path_1.clone(),
-        test_image_name_1.clone(),
+        "".to_string(),
+        "".to_string(),
         true
     ).unwrap();
     let users = User::table.select((
@@ -286,20 +327,33 @@ fn test_add_user() {
         .unwrap();
     let added_row_1 = &users[0];
     let added_row_2 = &users[1];
+    let inserted_decks = Deck::table.select((
+        Deck::name,
+        Deck::user,
+        Deck::size,
+        Deck::mastered,
+    ))
+        .load::<(String, i32, i32, i32)>(&mut conn)
+        .unwrap();
 
     assert_eq!(added_row_1.0, test_user_data_1.username);
     assert_eq!(added_row_1.1.unwrap(), 2);
     assert_eq!(added_row_1.2, 1);
     assert_eq!(added_row_1.3, 0);
     assert_eq!(added_row_1.4, false);
+    assert_eq!(test_user_data_1, ret_1);
 
     assert_eq!(added_row_2.0, test_user_data_2.username);
-    assert_eq!(added_row_2.1, None);
+    assert_eq!(added_row_2.1.unwrap(), 1);
     assert_eq!(added_row_2.2, 1);
     assert_eq!(added_row_2.3, 0);
     assert_eq!(added_row_2.4, false);
-    //todo!();
 
-    // assert on default theme(normal), tagmask(0), hidediffs(false)
     // assert on insertion and non-insertion of prefill deck
+    assert_eq!(initial_decks.len(), 1);
+    assert_eq!(inserted_decks.len(), 2);
+    assert_eq!(inserted_decks[1].0, TEST_PREFILL_DECK_NAME.to_string());
+    assert_eq!(inserted_decks[1].1, 2);
+    assert_eq!(inserted_decks[1].2, TEST_PREFILL_DECK_SIZE);
+    assert_eq!(inserted_decks[1].3, 0);
 }
