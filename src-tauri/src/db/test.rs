@@ -355,3 +355,66 @@ fn test_add_user() {
     assert_eq!(inserted_decks[1].2, TEST_PREFILL_DECK_SIZE);
     assert_eq!(inserted_decks[1].3, 0);
 }
+
+fn insert_test_deck(
+    conn: &mut SqliteConnection,
+    name: String,
+    user: i32,
+    test_cards: Option<Vec<i32>>
+) -> Result<(), Box<dyn Error>> {
+    use schema::{ Deck, Card_Deck };
+    insert_into(Deck::table)
+        .values((Deck::name.eq(name), Deck::user.eq(user)))
+        .execute(conn)?;
+    let deck_id: i32 = Deck::table.select(Deck::id)
+        .order(Deck::id.desc())
+        .first(conn)?;
+    if let Some(cards) = test_cards {
+        for card_id in cards {
+            insert_into(Card_Deck::table)
+                .values((
+                    Card_Deck::card.eq(card_id),
+                    Card_Deck::deck.eq(deck_id),
+                ))
+                .execute(conn)?;
+        }
+    }
+    Ok(())
+}
+
+#[test]
+fn test_load_user_decks() {
+    // associate added decks with users
+    // call load_user_decks on test users
+    // assert on correct decks loaded, deck data
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+
+    insert_test_user(
+        &mut conn,
+        "test_user_1".to_string(),
+        None,
+        PreDefThemeType::Normal,
+        0,
+        false
+    ).unwrap();
+    insert_test_user(
+        &mut conn,
+        "test_user_2".to_string(),
+        None,
+        PreDefThemeType::Normal,
+        0,
+        false
+    ).unwrap();
+
+    let mut conn = insert_test_preshipped_lc_deck(conn).unwrap();
+    let test_deck_name_2 = "test_deck_2";
+    insert_test_deck(
+        &mut conn,
+        test_deck_name_2.to_string(),
+        1,
+        Some(vec![1, 2])
+    ).unwrap();
+
+    todo!();
+}
