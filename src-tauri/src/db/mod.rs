@@ -14,6 +14,8 @@ use diesel_migrations::{
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
 const DATABASE_URL: &str = "sqlite://cpf.db";
 const NUM_LC_QUESTIONS: i32 = 2547;
+const DEFAULT_IMAGE_NAME: &str = "default";
+const DEFAULT_IMAGE_PATH: &str = "images/default-avatar.png";
 
 pub fn run_migrations() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
     let conn = &mut establish_connection(true);
@@ -146,7 +148,7 @@ pub fn add_user(
     conn: &mut SqliteConnection,
     username: String,
     default_avatar: bool,
-    avatar_path: String,
+    mut avatar_path: String,
     avatar_name: String,
     prefill_deck: bool
 ) -> Result<UserData, Box<dyn Error>> {
@@ -166,6 +168,8 @@ pub fn add_user(
                 .limit(1)
                 .load::<i32>(conn)
                 .unwrap()[0];
+        } else {
+            avatar_path = DEFAULT_IMAGE_PATH.to_string();
         }
 
         insert_into(User::table)

@@ -1,5 +1,5 @@
 use super::*;
-use diesel::{ sqlite::{ SqliteConnection }, dsl::count_star };
+use diesel::sqlite::SqliteConnection;
 use diesel_migrations::{ embed_migrations, FileBasedMigrations };
 use crate::schema;
 
@@ -16,8 +16,6 @@ const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
     "./src/db/test_migrations/file_based/deck_prefill";
 const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
 const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
-const DEFAULT_IMAGE_NAME: &str = "default";
-const DEFAULT_IMAGE_PATH: &str = "images/default-avatar.png";
 const TEST_PREFILL_DECK_NAME: &str = "Deck 1";
 const TEST_PREFILL_DECK_SIZE: i32 = 2547;
 
@@ -348,8 +346,8 @@ fn test_add_user() {
     assert_eq!(added_row_2.2, 1);
     assert_eq!(added_row_2.3, 0);
     assert_eq!(added_row_2.4, false);
+    assert_eq!(test_user_data_2, ret_2);
 
-    // assert on insertion and non-insertion of prefill deck
     assert_eq!(initial_decks.len(), 1);
     assert_eq!(inserted_decks.len(), 2);
     assert_eq!(inserted_decks[1].0, TEST_PREFILL_DECK_NAME.to_string());
