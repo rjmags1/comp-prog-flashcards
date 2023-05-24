@@ -1,6 +1,6 @@
 INSERT INTO Source (name) VALUES ("Leetcode");
 
-INSERT INTO Deck (name, user) VALUES ("devDeck", 1);
+INSERT INTO Deck (name, user) VALUES ("test_lc_deck", 1);
 
 UPDATE Deck SET size = 2547 WHERE id = 1;
 INSERT INTO Tag (type, name, content)

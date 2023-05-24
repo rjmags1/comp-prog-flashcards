@@ -16,7 +16,8 @@ const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
     "./src/db/test_migrations/file_based/deck_prefill";
 const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
 const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
-const TEST_PREFILL_DECK_NAME: &str = "Deck 1";
+const TEST_MIGRATION_PREFILL_DECK_NAME: &str = "test_lc_deck";
+const DEFAULT_PREFILL_DECK_NAME: &str = "Deck 1";
 const TEST_PREFILL_DECK_SIZE: i32 = 2547;
 
 enum PreDefTagType {
