@@ -35,7 +35,10 @@ fn add_user(
 
 #[tauri::command]
 fn load_user_decks(user_id: i32) -> database::UserDecksData {
-    database::load_user_decks(user_id)
+    database::load_user_decks(
+        user_id,
+        &mut database::establish_connection(false)
+    )
 }
 
 #[tauri::command]

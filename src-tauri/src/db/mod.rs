@@ -239,9 +239,11 @@ pub struct UserDecksData {
 
 type DeckRow = (i32, String, i32, i32, i32);
 
-pub fn load_user_decks(user_id: i32) -> UserDecksData {
+pub fn load_user_decks(
+    user_id: i32,
+    conn: &mut SqliteConnection
+) -> UserDecksData {
     use schema::Deck;
-    let conn = &mut establish_connection(false);
 
     let user_decks = Deck::table.filter(Deck::user.eq(user_id))
         .load::<DeckRow>(conn)

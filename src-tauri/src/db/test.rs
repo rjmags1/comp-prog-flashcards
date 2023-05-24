@@ -250,7 +250,7 @@ fn test_load_app_context() {
     );
 }
 
-fn insert_test_preshipped_lc_deck(
+fn insert_test_preshipped_lc_deck_cards(
     mut conn: SqliteConnection
 ) -> Result<SqliteConnection, Box<dyn Error + Send + Sync>> {
     let m = FileBasedMigrations::from_path(
@@ -265,7 +265,7 @@ fn test_add_user() {
     use schema::{ User, Deck };
     let mut conn = init_test_db().unwrap();
     wipe_test_data(&mut conn).unwrap();
-    let mut conn = insert_test_preshipped_lc_deck(conn).unwrap();
+    let mut conn = insert_test_preshipped_lc_deck_cards(conn).unwrap();
     let test_image_name_1 = "test_image_1".to_string();
     let test_image_path_1 = "test_path_1".to_string();
 
@@ -351,7 +351,7 @@ fn test_add_user() {
 
     assert_eq!(initial_decks.len(), 1);
     assert_eq!(inserted_decks.len(), 2);
-    assert_eq!(inserted_decks[1].0, TEST_PREFILL_DECK_NAME.to_string());
+    assert_eq!(inserted_decks[1].0, DEFAULT_PREFILL_DECK_NAME.to_string());
     assert_eq!(inserted_decks[1].1, 2);
     assert_eq!(inserted_decks[1].2, TEST_PREFILL_DECK_SIZE);
     assert_eq!(inserted_decks[1].3, 0);
@@ -371,6 +371,10 @@ fn insert_test_deck(
         .order(Deck::id.desc())
         .first(conn)?;
     if let Some(cards) = test_cards {
+        update(Deck::table)
+            .filter(Deck::id.eq(deck_id))
+            .set(Deck::size.eq(cards.len() as i32))
+            .execute(conn)?;
         for card_id in cards {
             insert_into(Card_Deck::table)
                 .values((
@@ -408,14 +412,42 @@ fn test_load_user_decks() {
         false
     ).unwrap();
 
-    let mut conn = insert_test_preshipped_lc_deck(conn).unwrap();
-    let test_deck_name_2 = "test_deck_2";
+    let mut conn = insert_test_preshipped_lc_deck_cards(conn).unwrap();
     insert_test_deck(
         &mut conn,
-        test_deck_name_2.to_string(),
+        "test_deck_name_1".to_string(),
         1,
         Some(vec![1, 2])
     ).unwrap();
+    insert_test_deck(
+        &mut conn,
+        "test_deck_name_2".to_string(),
+        2,
+        Some(vec![1, 2])
+    ).unwrap();
+    insert_test_deck(
+        &mut conn,
+        "test_deck_name_3".to_string(),
+        2,
+        Some(vec![3])
+    ).unwrap();
 
-    todo!();
+    let user_1_decks = load_user_decks(1, &mut conn).decks;
+    // hacky but test lc deck associated w/ user id 1 in file based migration
+    assert_eq!(user_1_decks.len(), 2);
+    assert_eq!(user_1_decks[0].name, TEST_MIGRATION_PREFILL_DECK_NAME);
+    assert_eq!(user_1_decks[0].user, 1);
+    assert_eq!(user_1_decks[0].size, TEST_PREFILL_DECK_SIZE);
+    assert_eq!(user_1_decks[1].name, "test_deck_name_1".to_string());
+    assert_eq!(user_1_decks[1].user, 1);
+    assert_eq!(user_1_decks[1].size, 2);
+
+    let user_2_decks = load_user_decks(2, &mut conn).decks;
+    assert_eq!(user_2_decks.len(), 2);
+    assert_eq!(user_2_decks[0].name, "test_deck_name_2".to_string());
+    assert_eq!(user_2_decks[0].user, 2);
+    assert_eq!(user_2_decks[0].size, 2);
+    assert_eq!(user_2_decks[1].name, "test_deck_name_3".to_string());
+    assert_eq!(user_2_decks[1].user, 2);
+    assert_eq!(user_2_decks[1].size, 1);
 }
