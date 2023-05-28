@@ -223,7 +223,7 @@ pub fn add_user(
     })
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Debug)]
 pub struct DeckData {
     pub id: i32,
     pub name: String,
@@ -267,10 +267,10 @@ pub fn update_deck(
     deck_id: i32,
     name: String,
     size: i32,
-    mastered: i32
+    mastered: i32,
+    conn: &mut SqliteConnection
 ) -> Result<DeckData, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection(false);
 
     update(Deck::table)
         .filter(Deck::id.eq(deck_id))

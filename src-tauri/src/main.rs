@@ -53,7 +53,13 @@ fn update_deck(
     size: i32,
     mastered: i32
 ) -> Result<database::DeckData, String> {
-    let update_result = database::update_deck(deck_id, name, size, mastered);
+    let update_result = database::update_deck(
+        deck_id,
+        name,
+        size,
+        mastered,
+        &mut database::establish_connection(false)
+    );
     match update_result {
         Ok(updated_deck) => Ok(updated_deck),
         Err(e) => Err(format!("Deck update failure: {}", e)),

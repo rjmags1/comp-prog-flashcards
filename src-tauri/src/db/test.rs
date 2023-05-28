@@ -389,9 +389,6 @@ fn insert_test_deck(
 
 #[test]
 fn test_load_user_decks() {
-    // associate added decks with users
-    // call load_user_decks on test users
-    // assert on correct decks loaded, deck data
     let mut conn = init_test_db().unwrap();
     wipe_test_data(&mut conn).unwrap();
 
@@ -450,4 +447,36 @@ fn test_load_user_decks() {
     assert_eq!(user_2_decks[1].name, "test_deck_name_3".to_string());
     assert_eq!(user_2_decks[1].user, 2);
     assert_eq!(user_2_decks[1].size, 1);
+}
+
+#[test]
+fn test_update_deck() {
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    use schema::Deck;
+
+    insert_test_deck(
+        &mut conn,
+        "test_deck_name_1".to_string(),
+        1,
+        Some(vec![1, 2])
+    ).unwrap();
+    let test_id = Deck::table.select(Deck::id)
+        .load::<i32>(&mut conn)
+        .unwrap()[0];
+    assert_eq!(test_id, 1);
+
+    let updated_name = "updated_test_deck_name_1";
+    let updated_size = 4;
+    let updated_mastered = 2;
+    let updated = update_deck(
+        1,
+        updated_name.to_string(),
+        updated_size,
+        updated_mastered,
+        &mut conn
+    ).unwrap();
+    assert_eq!(updated.name, updated_name.to_string());
+    assert_eq!(updated.size, updated_size);
+    assert_eq!(updated.mastered, updated_mastered);
 }
