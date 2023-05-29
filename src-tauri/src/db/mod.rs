@@ -223,7 +223,7 @@ pub fn add_user(
     })
 }
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, PartialEq, Debug)]
 pub struct DeckData {
     pub id: i32,
     pub name: String,
@@ -303,10 +303,12 @@ pub fn delete_deck(
     Ok(deck_id)
 }
 
-pub fn add_deck(name: String, user: i32) -> Result<DeckData, Box<dyn Error>> {
+pub fn add_deck(
+    name: String,
+    user: i32,
+    conn: &mut SqliteConnection
+) -> Result<DeckData, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection(false);
-
     diesel
         ::insert_into(Deck::table)
         .values((Deck::name.eq(name), Deck::user.eq(user)))

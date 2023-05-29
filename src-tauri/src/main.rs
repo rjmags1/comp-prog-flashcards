@@ -80,7 +80,11 @@ fn delete_deck(deck_id: i32) -> Result<i32, String> {
 
 #[tauri::command]
 fn add_deck(name: String, user: i32) -> Result<database::DeckData, String> {
-    let add_result = database::add_deck(name, user);
+    let add_result = database::add_deck(
+        name,
+        user,
+        &mut database::establish_connection(false)
+    );
 
     match add_result {
         Ok(added_deck) => Ok(added_deck),

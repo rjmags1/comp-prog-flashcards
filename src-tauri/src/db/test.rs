@@ -501,3 +501,34 @@ fn test_delete_deck() {
         0
     );
 }
+
+#[test]
+fn test_add_deck() {
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    use schema::Deck;
+    assert_eq!(
+        Deck::table.select(Deck::id).load::<i32>(&mut conn).unwrap().len(),
+        0
+    );
+
+    let deck_name = "test_deck_name";
+    let deck_user_id = 1;
+    let deck_size = 0;
+    let deck_mastered = 0;
+    let added = DeckData {
+        id: 1,
+        name: deck_name.to_string(),
+        user: deck_user_id,
+        size: deck_size,
+        mastered: deck_mastered,
+    };
+
+    let inserted = add_deck(
+        deck_name.to_string(),
+        deck_user_id,
+        &mut conn
+    ).unwrap();
+
+    assert_eq!(added, inserted);
+}
