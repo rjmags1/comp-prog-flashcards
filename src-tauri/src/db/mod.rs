@@ -293,10 +293,11 @@ pub fn update_deck(
     })
 }
 
-pub fn delete_deck(deck_id: i32) -> Result<i32, Box<dyn Error>> {
+pub fn delete_deck(
+    deck_id: i32,
+    conn: &mut SqliteConnection
+) -> Result<i32, Box<dyn Error>> {
     use schema::Deck;
-    let conn = &mut establish_connection(false);
-
     delete(Deck::table.filter(Deck::id.eq(deck_id))).execute(conn)?;
 
     Ok(deck_id)

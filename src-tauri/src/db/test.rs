@@ -480,3 +480,24 @@ fn test_update_deck() {
     assert_eq!(updated.size, updated_size);
     assert_eq!(updated.mastered, updated_mastered);
 }
+
+#[test]
+fn test_delete_deck() {
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    use schema::Deck;
+    assert_eq!(
+        Deck::table.select(Deck::id).load::<i32>(&mut conn).unwrap().len(),
+        0
+    );
+    insert_test_deck(&mut conn, "test_deck".to_string(), 1, None).unwrap();
+    assert_eq!(
+        Deck::table.select(Deck::id).load::<i32>(&mut conn).unwrap()[0],
+        1
+    );
+    delete_deck(1, &mut conn).unwrap();
+    assert_eq!(
+        Deck::table.select(Deck::id).load::<i32>(&mut conn).unwrap().len(),
+        0
+    );
+}

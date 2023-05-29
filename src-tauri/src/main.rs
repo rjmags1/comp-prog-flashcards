@@ -68,7 +68,10 @@ fn update_deck(
 
 #[tauri::command]
 fn delete_deck(deck_id: i32) -> Result<i32, String> {
-    let delete_result = database::delete_deck(deck_id);
+    let delete_result = database::delete_deck(
+        deck_id,
+        &mut database::establish_connection(false)
+    );
     match delete_result {
         Ok(deleted_id) => Ok(deleted_id),
         Err(e) => Err(format!("Deck delete failure: {}", e)),
