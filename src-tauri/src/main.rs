@@ -4,7 +4,7 @@
     windows_subsystem = "windows"
 )]
 
-use app::database;
+use app::database::{ self, establish_connection };
 
 #[tauri::command]
 fn load_app_context() -> database::AppContextDbData {
@@ -94,7 +94,7 @@ fn add_deck(name: String, user: i32) -> Result<database::DeckData, String> {
 
 #[tauri::command]
 fn load_card_metadata(deck_id: i32) -> database::DeckCardsMetadata {
-    database::load_deck_metadata(deck_id)
+    database::load_deck_metadata(deck_id, &mut establish_connection(false))
 }
 
 #[tauri::command]

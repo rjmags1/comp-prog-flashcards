@@ -1,7 +1,7 @@
 use super::*;
-use diesel::sqlite::SqliteConnection;
+use diesel::sqlite::{ SqliteConnection, Sqlite };
 use diesel_migrations::{ embed_migrations, FileBasedMigrations };
-use crate::schema;
+use crate::schema::{ self, DifficultyEnum };
 
 // general plan
 //   - write establish_test_connection fn using ":memory:" sqlite db
@@ -17,6 +17,7 @@ const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
 const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
 const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
 const TEST_MIGRATION_PREFILL_DECK_NAME: &str = "test_lc_deck";
+const TEST_MIGRATION_PREFILL_DECK_SOURCE: &str = "Leetcode";
 const DEFAULT_PREFILL_DECK_NAME: &str = "Deck 1";
 const TEST_PREFILL_DECK_SIZE: i32 = 2547;
 
@@ -531,4 +532,138 @@ fn test_add_deck() {
     ).unwrap();
 
     assert_eq!(added, inserted);
+}
+
+fn insert_test_card(
+    conn: &mut SqliteConnection,
+    prompt: String,
+    title: String,
+    mastered: bool,
+    card_id: i32,
+    notes: String,
+    difficulty: i32,
+    source: Option<i32>,
+    shipped: bool,
+    tags: Vec<i32>
+) {
+    use schema::{ Card, CardBack, CardFront, Card_Tag };
+    insert_into(CardFront::table)
+        .values((
+            CardFront::prompt.eq(prompt),
+            CardFront::card.eq(card_id),
+            CardFront::title.eq(title),
+        ))
+        .execute(conn)
+        .unwrap();
+    insert_into(CardBack::table)
+        .values((CardBack::card.eq(card_id), CardBack::notes.eq(notes)))
+        .execute(conn)
+        .unwrap();
+    insert_into(Card::table)
+        .values((
+            Card::front.eq(card_id),
+            Card::back.eq(card_id),
+            Card::mastered.eq(mastered),
+            Card::source.eq(source),
+            Card::shipped.eq(shipped),
+            Card::difficulty.eq(difficulty),
+        ))
+        .execute(conn)
+        .unwrap();
+    for tag_id in tags.into_iter() {
+        insert_into(Card_Tag::table)
+            .values((Card_Tag::card.eq(card_id), Card_Tag::tag.eq(tag_id)))
+            .execute(conn)
+            .unwrap();
+    }
+}
+
+#[test]
+fn test_load_deck_metadata() {
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    // insert test cards
+    let test_prompt_1 = "test_prompt_1";
+    let test_prompt_2 = "test_prompt_2";
+    let test_title_1 = "test_title_1";
+    let test_title_2 = "test_title_2";
+    let test_mastered_1 = false;
+    let test_mastered_2 = true;
+    let test_card_id_1 = 1;
+    let test_card_id_2 = 2;
+    let test_notes_1 = "test_notes_1";
+    let test_notes_2 = "test_notes_2";
+    let test_diff_1 = 1;
+    let test_diff_string_1 = "Easy";
+    let test_diff_2 = 2;
+    let test_diff_string_2 = "Medium";
+    let test_source_1: Option<i32> = None;
+    let test_source_2: Option<i32> = None;
+    let test_shipped_1 = false;
+    let test_shipped_2 = true;
+    let test_tags_1 = vec![1, 2, 3];
+    let test_tags_2: Vec<i32> = vec![];
+    insert_test_card(
+        &mut conn,
+        test_prompt_1.to_string(),
+        test_title_1.to_string(),
+        test_mastered_1,
+        test_card_id_1,
+        test_notes_1.to_string(),
+        test_diff_1,
+        test_source_1,
+        test_shipped_1,
+        test_tags_1.clone()
+    );
+    insert_test_card(
+        &mut conn,
+        test_prompt_2.to_string(),
+        test_title_2.to_string(),
+        test_mastered_2,
+        test_card_id_2,
+        test_notes_2.to_string(),
+        test_diff_2,
+        test_source_2,
+        test_shipped_2,
+        test_tags_2.clone()
+    );
+    let card_metadata_1 = CardMetadata {
+        id: test_card_id_1,
+        front: test_card_id_1,
+        back: test_card_id_1,
+        mastered: test_mastered_1,
+        source: None,
+        shipped: test_shipped_1,
+        difficulty: test_diff_string_1.to_string(),
+        tags: test_tags_1,
+    };
+    let card_metadata_2 = CardMetadata {
+        id: test_card_id_2,
+        front: test_card_id_2,
+        back: test_card_id_2,
+        mastered: test_mastered_2,
+        source: None,
+        shipped: test_shipped_2,
+        difficulty: test_diff_string_2.to_string(),
+        tags: test_tags_2,
+    };
+
+    let test_deck_id = 1;
+    let test_deck_name = "test_deck_name";
+    let test_deck_user_id = 1;
+    let test_deck_card_ids = vec![1, 2];
+    insert_test_deck(
+        &mut conn,
+        test_deck_name.to_string(),
+        test_deck_user_id,
+        Some(test_deck_card_ids)
+    ).unwrap();
+    let deck_metadata = DeckCardsMetadata {
+        deck_id: test_deck_id,
+        deck_name: test_deck_name.to_string(),
+        card_metadata: vec![card_metadata_1, card_metadata_2],
+    };
+
+    let loaded = load_deck_metadata(test_deck_id, &mut conn);
+    assert_eq!(deck_metadata, loaded);
 }

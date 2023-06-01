@@ -326,7 +326,7 @@ pub fn add_deck(
     })
 }
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, Debug, PartialEq)]
 pub struct CardMetadata {
     pub id: i32,
     pub front: i32,
@@ -349,16 +349,18 @@ type PartialCardMetadataRow = (
     Option<i32>,
 );
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, Debug, PartialEq)]
 pub struct DeckCardsMetadata {
     pub deck_id: i32,
     pub deck_name: String,
     pub card_metadata: Vec<CardMetadata>,
 }
 
-pub fn load_deck_metadata(deck_id: i32) -> DeckCardsMetadata {
+pub fn load_deck_metadata(
+    deck_id: i32,
+    conn: &mut SqliteConnection
+) -> DeckCardsMetadata {
     use schema::{ Deck, Card_Deck, Card, Card_Tag, Source, DifficultyEnum };
-    let conn = &mut establish_connection(false);
 
     let cards_tags = Deck::table.filter(Deck::id.eq(deck_id))
         .inner_join(Card_Deck::table)
