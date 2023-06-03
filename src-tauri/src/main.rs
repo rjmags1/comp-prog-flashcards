@@ -103,7 +103,12 @@ fn load_card(
     card_front_id: i32,
     card_back_id: i32
 ) -> database::CardContentData {
-    database::load_card(card_id, card_front_id, card_back_id)
+    database::load_card(
+        &mut establish_connection(false),
+        card_id,
+        card_front_id,
+        card_back_id
+    )
 }
 
 #[tauri::command]

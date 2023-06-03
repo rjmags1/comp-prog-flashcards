@@ -1,7 +1,6 @@
 use super::*;
-use diesel::sqlite::{ SqliteConnection, Sqlite };
+use diesel::sqlite::SqliteConnection;
 use diesel_migrations::{ embed_migrations, FileBasedMigrations };
-use crate::schema::{ self, DifficultyEnum };
 
 // general plan
 //   - write establish_test_connection fn using ":memory:" sqlite db
@@ -17,7 +16,6 @@ const TEST_DECK_PREFILL_MIGRATION_PATH: &str =
 const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
 const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
 const TEST_MIGRATION_PREFILL_DECK_NAME: &str = "test_lc_deck";
-const TEST_MIGRATION_PREFILL_DECK_SOURCE: &str = "Leetcode";
 const DEFAULT_PREFILL_DECK_NAME: &str = "Deck 1";
 const TEST_PREFILL_DECK_SIZE: i32 = 2547;
 
@@ -666,4 +664,96 @@ fn test_load_deck_metadata() {
 
     let loaded = load_deck_metadata(test_deck_id, &mut conn);
     assert_eq!(deck_metadata, loaded);
+}
+
+fn insert_test_solution(
+    conn: &mut SqliteConnection,
+    name: String,
+    content: String,
+    card_back_id: i32
+) {
+    use schema::Solution;
+    insert_into(Solution::table)
+        .values((
+            Solution::name.eq(name),
+            Solution::content.eq(content),
+            Solution::cardback.eq(card_back_id),
+        ))
+        .execute(conn)
+        .unwrap();
+}
+
+#[test]
+fn test_load_card() {
+    // init_test_db and wipe default data
+    // insert test cards
+    // assert on data loaded into CardContentData
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    let test_prompt = "test_prompt";
+    let test_title = "test_title";
+    let test_mastered = false;
+    let test_card_id = 1;
+    let test_card_front_id = 1;
+    let test_card_back_id = 1;
+    let test_notes = "test_notes";
+    let test_diff = 1;
+    let test_source: Option<i32> = None;
+    let test_shipped = false;
+    let test_tags = vec![1, 2, 3];
+    insert_test_card(
+        &mut conn,
+        test_prompt.to_string(),
+        test_title.to_string(),
+        test_mastered,
+        test_card_id,
+        test_notes.to_string(),
+        test_diff,
+        test_source,
+        test_shipped,
+        test_tags.clone()
+    );
+    let test_solution_name_1 = "test_solution_name_1";
+    let test_solution_name_2 = "test_solution_name_2";
+    let test_solution_1 = "test_solution_1";
+    let test_solution_2 = "test_solution_2";
+    insert_test_solution(
+        &mut conn,
+        test_solution_name_1.to_string(),
+        test_solution_1.to_string(),
+        test_card_back_id
+    );
+    insert_test_solution(
+        &mut conn,
+        test_solution_name_2.to_string(),
+        test_solution_2.to_string(),
+        test_card_back_id
+    );
+    let test_card = CardContentData {
+        card_id: test_card_id,
+        title: test_title.to_string(),
+        prompt: test_prompt.to_string(),
+        notes: test_notes.to_string(),
+        solutions: vec![
+            SolutionData {
+                id: 1,
+                content: test_solution_1.to_string(),
+                name: test_solution_name_1.to_string(),
+            },
+            SolutionData {
+                id: 2,
+                content: test_solution_2.to_string(),
+                name: test_solution_name_2.to_string(),
+            }
+        ],
+    };
+
+    let loaded = load_card(
+        &mut conn,
+        test_card_id,
+        test_card_front_id,
+        test_card_back_id
+    );
+
+    assert_eq!(test_card, loaded);
 }

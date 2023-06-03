@@ -14,7 +14,6 @@ use diesel_migrations::{
 const MIGRATIONS: EmbeddedMigrations = embed_migrations!("./migrations");
 const DATABASE_URL: &str = "sqlite://cpf.db";
 const NUM_LC_QUESTIONS: i32 = 2547;
-const DEFAULT_IMAGE_NAME: &str = "default";
 const DEFAULT_IMAGE_PATH: &str = "images/default-avatar.png";
 
 pub fn run_migrations() -> Result<(), Box<dyn Error + Send + Sync + 'static>> {
@@ -439,7 +438,7 @@ pub fn load_deck_metadata(
     }
 }
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, Debug, PartialEq)]
 pub struct CardContentData {
     card_id: i32,
     title: String,
@@ -448,7 +447,7 @@ pub struct CardContentData {
     solutions: Vec<SolutionData>,
 }
 
-#[derive(serde::Serialize, Debug)]
+#[derive(serde::Serialize, Debug, PartialEq)]
 pub struct SolutionData {
     id: i32,
     content: String,
@@ -456,12 +455,12 @@ pub struct SolutionData {
 }
 
 pub fn load_card(
+    conn: &mut SqliteConnection,
     card_id: i32,
     card_front_id: i32,
     card_back_id: i32
 ) -> CardContentData {
     use schema::{ CardFront, CardBack, Solution };
-    let conn = &mut establish_connection(false);
 
     let (prompt, title) = CardFront::table.filter(
         CardFront::id.eq(card_front_id)
