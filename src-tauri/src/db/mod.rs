@@ -494,10 +494,10 @@ pub fn add_card(
     source_id: Option<i32>,
     source_name: Option<String>,
     difficulty: String,
-    deck_id: i32
+    deck_id: i32,
+    conn: &mut SqliteConnection
 ) -> Result<CardMetadata, Box<dyn Error>> {
     use schema::{ Card, DifficultyEnum, CardFront, CardBack, Deck, Card_Deck };
-    let conn = &mut establish_connection(true);
 
     conn.transaction(|conn| {
         let new_card_id: i32 =

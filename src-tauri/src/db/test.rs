@@ -17,7 +17,8 @@ const PRE_DEF_TAG_TYPE_NAMES: &[&str] = &["Paradigm", "Concept", "Trick"];
 const PRE_DEF_THEME_TYPE_NAMES: &[&str] = &["Normal", "Dark"];
 const TEST_MIGRATION_PREFILL_DECK_NAME: &str = "test_lc_deck";
 const DEFAULT_PREFILL_DECK_NAME: &str = "Deck 1";
-const TEST_PREFILL_DECK_SIZE: i32 = 2547;
+const TEST_PREFILL_DECK_SIZE: i32 = 11;
+const PREFILL_DECK_SIZE: i32 = 2547;
 
 enum PreDefTagType {
     Paradigm = 1,
@@ -352,7 +353,7 @@ fn test_add_user() {
     assert_eq!(inserted_decks.len(), 2);
     assert_eq!(inserted_decks[1].0, DEFAULT_PREFILL_DECK_NAME.to_string());
     assert_eq!(inserted_decks[1].1, 2);
-    assert_eq!(inserted_decks[1].2, TEST_PREFILL_DECK_SIZE);
+    assert_eq!(inserted_decks[1].2, PREFILL_DECK_SIZE);
     assert_eq!(inserted_decks[1].3, 0);
 }
 
@@ -433,7 +434,7 @@ fn test_load_user_decks() {
     assert_eq!(user_1_decks.len(), 2);
     assert_eq!(user_1_decks[0].name, TEST_MIGRATION_PREFILL_DECK_NAME);
     assert_eq!(user_1_decks[0].user, 1);
-    assert_eq!(user_1_decks[0].size, TEST_PREFILL_DECK_SIZE);
+    assert_eq!(user_1_decks[0].size, PREFILL_DECK_SIZE);
     assert_eq!(user_1_decks[1].name, "test_deck_name_1".to_string());
     assert_eq!(user_1_decks[1].user, 1);
     assert_eq!(user_1_decks[1].size, 2);
@@ -685,9 +686,6 @@ fn insert_test_solution(
 
 #[test]
 fn test_load_card() {
-    // init_test_db and wipe default data
-    // insert test cards
-    // assert on data loaded into CardContentData
     let mut conn = init_test_db().unwrap();
     wipe_test_data(&mut conn).unwrap();
     let test_prompt = "test_prompt";
@@ -756,4 +754,39 @@ fn test_load_card() {
     );
 
     assert_eq!(test_card, loaded);
+}
+
+#[test]
+fn test_add_card() {
+    // init_test_db and wipe default data
+    // insert test card
+    // assert on data loaded into CardMetadata
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    let mut conn = insert_test_preshipped_lc_deck_cards(conn).unwrap();
+    let test_card_title = "test_title";
+    let test_source_id = 1;
+    let test_source_name = "test_source";
+    let test_diff = "Easy";
+    let test_deck_id = 1;
+    let expected_metadata = CardMetadata {
+        id: TEST_PREFILL_DECK_SIZE,
+        front: TEST_PREFILL_DECK_SIZE,
+        back: TEST_PREFILL_DECK_SIZE,
+        mastered: false,
+        source: Some(test_source_name.to_string()),
+        shipped: false,
+        difficulty: test_diff.to_string(),
+        tags: vec![],
+    };
+    let inserted = add_card(
+        test_card_title.to_string(),
+        Some(test_source_id),
+        Some(test_source_name.to_string()),
+        test_diff.to_string(),
+        test_deck_id,
+        &mut conn
+    ).unwrap();
+
+    assert_eq!(expected_metadata, inserted);
 }

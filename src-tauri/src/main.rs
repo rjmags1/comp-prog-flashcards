@@ -124,7 +124,8 @@ fn add_card(
         source_id,
         source_name,
         difficulty,
-        deck_id
+        deck_id,
+        &mut establish_connection(false)
     );
 
     match add_result {
