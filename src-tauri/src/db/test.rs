@@ -758,9 +758,6 @@ fn test_load_card() {
 
 #[test]
 fn test_add_card() {
-    // init_test_db and wipe default data
-    // insert test card
-    // assert on data loaded into CardMetadata
     let mut conn = init_test_db().unwrap();
     wipe_test_data(&mut conn).unwrap();
     let mut conn = insert_test_preshipped_lc_deck_cards(conn).unwrap();
@@ -789,4 +786,64 @@ fn test_add_card() {
     ).unwrap();
 
     assert_eq!(expected_metadata, inserted);
+}
+
+#[test]
+fn test_load_card_titles() {
+    let mut conn = init_test_db().unwrap();
+    wipe_test_data(&mut conn).unwrap();
+    let test_prompt = "test_prompt_1";
+    let test_title_1 = "test_title_1";
+    let test_title_2 = "test_title_2";
+    let test_mastered = false;
+    let test_card_id_1 = 1;
+    let test_card_id_2 = 2;
+    let test_notes = "test_notes_1";
+    let test_diff = 1;
+    let test_source: Option<i32> = None;
+    let test_shipped = false;
+    let test_tags = vec![1, 2, 3];
+    insert_test_card(
+        &mut conn,
+        test_prompt.to_string(),
+        test_title_1.to_string(),
+        test_mastered,
+        test_card_id_1,
+        test_notes.to_string(),
+        test_diff,
+        test_source,
+        test_shipped,
+        test_tags.clone()
+    );
+    insert_test_card(
+        &mut conn,
+        test_prompt.to_string(),
+        test_title_2.to_string(),
+        test_mastered,
+        test_card_id_2,
+        test_notes.to_string(),
+        test_diff,
+        test_source,
+        test_shipped,
+        test_tags.clone()
+    );
+
+    let test_deck_id = 1;
+    let test_deck_name = "test_deck";
+    let test_deck_cards = vec![1, 2];
+    let test_deck_user_id = 1;
+    insert_test_deck(
+        &mut conn,
+        test_deck_name.to_string(),
+        test_deck_user_id,
+        Some(test_deck_cards)
+    ).unwrap();
+
+    let expected_card_titles = vec![
+        (test_card_id_1, test_title_1.to_string()),
+        (test_card_id_2, test_title_2.to_string())
+    ];
+    let loaded = load_card_titles(test_deck_id, &mut conn);
+
+    assert_eq!(loaded, expected_card_titles);
 }

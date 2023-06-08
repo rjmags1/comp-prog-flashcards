@@ -136,7 +136,7 @@ fn add_card(
 
 #[tauri::command]
 fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
-    database::load_card_titles(deck_id)
+    database::load_card_titles(deck_id, &mut establish_connection(false))
 }
 
 #[tauri::command]

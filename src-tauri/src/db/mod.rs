@@ -567,9 +567,11 @@ pub fn add_card(
     })
 }
 
-pub fn load_card_titles(deck_id: i32) -> Vec<(i32, String)> {
+pub fn load_card_titles(
+    deck_id: i32,
+    conn: &mut SqliteConnection
+) -> Vec<(i32, String)> {
     use schema::{ CardFront, Card_Deck };
-    let conn = &mut establish_connection(false);
 
     Card_Deck::table.filter(Card_Deck::deck.eq(deck_id))
         .inner_join(CardFront::table.on(CardFront::card.eq(Card_Deck::card)))
